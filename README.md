@@ -19,12 +19,12 @@ package main
 
 import (
 	"context"
-	"diadocer"
-	"diadocer/internal/config"
+	"diadocclient"
+	"diadocclient/internal/config"
 )
 
 func main() {
-	client := diadocer.New()
+	client := diadocclient.New()
 	u, _ := client.GetMyUserV2(context.Background())
 	println(u.String())
 }
