@@ -24,8 +24,7 @@ import (
 )
 
 func main() {
-	cfg := config.New()
-	client := diadocer.New(&cfg)
+	client := diadocer.New()
 	u, _ := client.GetMyUserV2(context.Background())
 	println(u.String())
 }
