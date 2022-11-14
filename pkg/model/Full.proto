@@ -1,0 +1,3060 @@
+syntax = "proto2";
+
+option go_package = "diadocer/model";
+
+message Address {
+  optional RussianAddress RussianAddress = 1;
+  optional ForeignAddress ForeignAddress = 2;
+  optional string AddressCode = 3;
+}
+
+message RussianAddress {
+  optional string ZipCode = 1;
+  required string Region = 2;
+  optional string Territory = 3;
+  optional string City = 4;
+  optional string Locality = 5;
+  optional string Street = 6;
+  optional string Building = 7;
+  optional string Block = 8;
+  optional string Apartment = 9;
+}
+
+message ForeignAddress {
+  required string Country = 1;
+  required string Address = 2;
+}
+
+message CounteragentList {
+  required int32 TotalCount = 1;
+  repeated Counteragent Counteragents = 2;
+  required TotalCountType TotalCountType = 3;
+}
+
+message Counteragent {
+  optional string IndexKey = 1;
+  required Organization Organization = 2;
+  optional CounteragentStatus CurrentStatus = 3 [default = UnknownCounteragentStatus];
+  required sfixed64 LastEventTimestampTicks = 4;
+  optional string MessageFromCounteragent = 6;
+  optional string MessageToCounteragent = 7;
+  optional DocumentId InvitationDocumentId = 8;
+}
+
+enum CounteragentStatus {
+  UnknownCounteragentStatus = 0;
+  IsMyCounteragent = 1;
+  InvitesMe = 2;
+  IsInvitedByMe = 3;
+  RejectsMe = 5;
+  IsRejectedByMe = 6;
+  NotInCounteragentList = 7;
+}
+
+enum TotalCountType {
+  UnknownCountType = 0;
+  Equal = 1;
+  GreaterThanOrEqual = 2;
+}
+
+message CounteragentCertificateList {
+  repeated Certificate Certificates = 1;
+}
+
+message Certificate {
+  required bytes RawCertificateData = 1;
+}
+
+message AcquireCounteragentRequest {
+  optional string OrgId = 1;
+  optional string Inn = 2;
+  optional string MessageToCounteragent = 3;
+  optional InvitationDocument InvitationDocument = 4;
+}
+
+message InvitationDocument {
+  required SignedContent SignedContent = 1;
+  required string FileName = 2;
+  optional bool SignatureRequested = 3 [default = false];
+}
+
+message Department
+{
+  required string DepartmentId = 1;
+  required string ParentDepartmentId = 2;
+  required string Name = 3;
+  optional string Abbreviation = 4;
+  optional string Kpp = 5;
+  optional Address Address = 6;
+}
+
+message DepartmentAdmin
+{
+  required string Id = 1;
+  optional string ParentDepartmentId = 2;
+  required string Name = 3;
+  required string Abbreviation = 4;
+  optional string Kpp = 5;
+  optional Address Address = 6;
+  required Routing Routing = 7;
+  required Timestamp CreationTimestamp = 8;
+}
+
+message DepartmentList
+{
+  repeated DepartmentAdmin Departments = 1;
+  required int32 TotalCount = 2; // Общее кол-во подразделений
+}
+
+message Routing
+{
+  required bool Kpp = 1;
+  required bool Address = 2;
+}
+
+message DepartmentToCreate
+{
+  optional string ParentDepartmentId = 1;
+  required string Name = 2;
+  required string Abbreviation = 3;
+  optional string Kpp = 4;
+  optional Address Address = 5;
+  required Routing Routing = 6;
+}
+
+message DepartmentToUpdate
+{
+  optional ParentDepartmentPatch ParentDepartment = 1;
+  optional DepartmentNamingPatch DepartmentNaming = 2;
+  optional DepartmentKppPatch Kpp = 3;
+  optional DepartmentAddressPatch Address = 4;
+  optional DepartmentRoutingPatch Routing = 5;
+}
+
+message ParentDepartmentPatch
+{
+  required string ParentDepartmentId = 1;
+}
+
+message DepartmentNamingPatch
+{
+  required string Name = 1;
+  required string Abbreviation = 2;
+}
+
+message DepartmentKppPatch
+{
+  optional string  Kpp = 1;
+}
+
+message DepartmentAddressPatch
+{
+  optional Address Address = 1;
+}
+
+message DepartmentRoutingPatch
+{
+  required bool Kpp = 1;
+  required bool Address = 2;
+}
+
+message DocumentId
+{
+  required string MessageId = 1;
+  required string EntityId = 2;
+}
+
+enum DocumentAccessLevel {
+  UnknownDocumentAccessLevel = -1;
+  DepartmentOnly = 0;
+  DepartmentAndSubdepartments = 1;
+  AllDocuments = 2;
+  SelectedDepartments = 3;
+}
+
+message Employee {
+  required UserV2 User = 1;
+  required EmployeePermissions Permissions = 2;
+  required string Position = 3;
+  required bool CanBeInvitedForChat = 4;
+  optional Timestamp CreationTimestamp = 5;
+}
+
+message EmployeePermissions {
+  required string UserDepartmentId = 1;
+  required bool IsAdministrator = 2;
+  required DocumentAccessLevel DocumentAccessLevel = 3 [default = UnknownDocumentAccessLevel];
+  repeated string SelectedDepartmentIds = 4;
+  repeated EmployeeAction Actions = 5;
+  optional AuthorizationPermission AuthorizationPermission = 6;
+}
+
+message EmployeeAction {
+  required string Name = 1;
+  required bool IsAllowed = 2;
+}
+
+message AuthorizationPermission
+{
+  required bool IsBlocked = 1;
+  optional string Comment = 2;
+}
+
+message UserV2 {
+  required string UserId = 1;
+  optional string Login = 2;
+  optional FullName FullName = 3;
+  required bool IsRegistered = 4;
+}
+
+message FullName {
+  required string LastName = 1;
+  required string FirstName = 2;
+  optional string MiddleName = 3;
+}
+
+message EmployeeList {
+  repeated Employee Employees = 1;
+  required int32 TotalCount = 2;
+}
+
+message User {
+  optional string Id = 1;
+  optional string LastName = 2;
+  optional string FirstName = 3;
+  optional string MiddleName = 4;
+  repeated CertificateInfo CloudCertificates = 5;
+}
+
+message CertificateInfo {
+  optional string Thumbprint = 1;
+  optional sfixed64 ValidFrom = 2;
+  optional sfixed64 ValidTo = 3;
+  optional string OrganizationName = 4;
+  optional string Inn = 5;
+}
+
+message OrganizationUser {
+  required string Id = 1;
+  required string Name = 2; // ФИО сотрудника
+  required OrganizationUserPermissions Permissions = 3;
+  required string Position = 4;
+}
+
+message OrganizationUsersList {
+  repeated OrganizationUser Users = 1;
+}
+
+message OrganizationUserPermissions {
+  required string UserDepartmentId = 1;
+  required bool IsAdministrator = 2;
+  optional DocumentAccessLevel DocumentAccessLevel = 3 [default = UnknownDocumentAccessLevel];
+  required bool CanSignDocuments = 4;
+  required bool CanManageCounteragents = 6;
+  required bool CanAddResolutions = 7;
+  required bool CanRequestResolutions = 8;
+  repeated string SelectedDepartmentIds = 9;
+  optional string JobTitle = 10;
+  required bool CanCreateDocuments = 11;
+  required AuthorizationPermission AuthorizationPermission = 12;
+  required bool CanDeleteRestoreDocuments = 13;
+}
+
+message EmployeeSubscriptions {
+  repeated Subscription Subscriptions = 1;
+}
+
+message Subscription
+{
+  required string Id = 1;
+  required bool IsSubscribed = 2;
+}
+
+message SubscriptionsToUpdate {
+  repeated Subscription Subscriptions = 1;
+}
+
+message CertificateList {
+  repeated CertificateInfoV2 Certificates = 1;
+}
+
+message CertificateInfoV2 {
+  required string Thumbprint = 1;
+  required CertificateType Type = 2;
+  optional sfixed64 ValidFrom = 3;
+  optional sfixed64 ValidTo = 4;
+  optional sfixed64 PrivateKeyValidFrom = 5;
+  optional sfixed64 PrivateKeyValidTo = 6;
+  optional string OrganizationName = 7;
+  optional string Inn = 8;
+  optional string UserFirstName = 9;
+  optional string UserMiddleName = 10;
+  optional string UserLastName = 11;
+  optional string UserShortName = 12;
+  optional bool IsDefault = 13;
+  optional CertificateSubjectType SubjectType = 14;
+}
+
+enum CertificateType {
+  Unknown = 0;
+  Token = 1;
+  Dss = 2;
+  KonturCertificate = 3;
+}
+
+enum CertificateSubjectType {
+  UnknownCertificateSubjectType = 0;
+  LegalEntity = 1;
+  IndividualEntity = 2;
+  PhysicalPerson = 3;
+}
+
+message EmployeeToCreate
+{
+  required EmployeeToCreateCredentials Credentials = 1;
+  optional string Position = 2;
+  required bool CanBeInvitedForChat = 3;
+  required EmployeePermissions Permissions = 4;
+}
+
+message EmployeeToCreateCredentials
+{
+  optional EmployeeToCreateByLogin Login = 1;
+  optional EmployeeToCreateByCertificate Certificate = 2;
+}
+
+message EmployeeToCreateByLogin
+{
+  required string Login = 1;
+  optional FullName FullName = 2;
+}
+
+message EmployeeToCreateByCertificate
+{
+  required bytes Content = 1;
+  optional string AccessBasis = 2;
+  optional string Email = 3;
+}
+
+message EmployeeToUpdate
+{
+  optional EmployeePermissionsPatch Permissions = 1;
+  optional EmployeePositionPatch Position = 2;
+  optional EmployeeCanBeInvitedForChatPatch CanBeInvitedForChat = 3;
+}
+
+message EmployeePermissionsPatch
+{
+  optional EmployeeDepartmentPatch Department = 1;
+  optional EmployeeIsAdministratorPatch IsAdministrator = 2;
+  optional EmployeeDocumentAccessLevelPatch DocumentAccessLevel = 3;
+  optional EmployeeSelectedDepartmentsPatch SelectedDepartments = 4;
+  repeated EmployeeAction Actions = 5;
+  optional AuthorizationPermissionPatch AuthorizationPermission = 6;
+}
+
+message EmployeeDepartmentPatch
+{
+  required string DepartmentId = 1;
+}
+
+message EmployeeDocumentAccessLevelPatch
+{
+  required DocumentAccessLevel DocumentAccessLevel = 1;
+}
+
+message EmployeeSelectedDepartmentsPatch
+{
+  repeated string SelectedDepartmentIds = 1;
+}
+
+message EmployeePositionPatch
+{
+  optional string Position = 1;
+}
+
+message EmployeeCanBeInvitedForChatPatch
+{
+  required bool CanBeInvitedForChat = 1;
+}
+
+message AuthorizationPermissionPatch
+{
+  required bool IsBlocked = 1;
+  optional string Comment = 2;
+}
+
+message EmployeeIsAdministratorPatch
+{
+  required bool IsAdministrator = 1;
+}
+
+message UserToUpdate
+{
+  optional UserLoginPatch Login = 1;
+  optional UserFullNamePatch FullName = 2;
+}
+
+message UserLoginPatch
+{
+  optional string Login = 1;
+}
+
+message UserFullNamePatch
+{
+  optional FullName FullName = 1;
+}
+
+message SignedContent {
+  optional bytes Content = 1;
+  optional bytes Signature = 2;
+  optional string NameOnShelf = 4;
+  optional bool SignWithTestSignature = 5 [default = false];
+  optional string SignatureNameOnShelf = 6;
+  optional PowerOfAttorneyToPost PowerOfAttorney = 7;
+}
+
+message PowerOfAttorneyToPost {
+  optional PowerOfAttorneyFullId FullId = 1;
+  required bool UseDefault = 2;
+}
+
+message PowerOfAttorneyFullId {
+  required string RegistrationNumber = 1;
+  required string IssuerInn = 2;
+}
+
+message PowerOfAttorneyValidationStatus {
+  optional Severity Severity = 1 [default = UnknownSeverity];
+  optional PowerOfAttorneyValidationStatusNamedId StatusNamedId = 2 [default = UnknownStatus];
+  optional string StatusText = 3;
+  repeated PowerOfAttorneyValidationError Errors = 4;
+}
+
+enum Severity {
+  UnknownSeverity = 0;
+  Info = 1;
+  Success = 2;
+  Warning = 3;
+  Error = 4;
+}
+
+enum PowerOfAttorneyValidationStatusNamedId {
+  UnknownStatus = 0;
+  CanNotBeValidated = 1;
+  IsValid = 2;
+  IsNotValid = 3;
+  ValidationError = 4;
+}
+
+message PowerOfAttorneyValidationError {
+  required string Code = 1;
+  required string Text = 2;
+}
+
+message GetOrganizationsByInnListRequest {
+  repeated string InnList = 1;
+}
+
+message OrganizationWithCounteragentStatus {
+  required Organization Organization = 1;
+  optional CounteragentStatus CounteragentStatus = 2 [default = UnknownCounteragentStatus];
+  optional sfixed64 LastEventTimestampTicks = 3;
+  optional string MessageFromCounteragent = 4;
+  optional string MessageToCounteragent = 5;
+  optional DocumentId InvitationDocumentId = 6;
+}
+
+message GetOrganizationsByInnListResponse {
+  repeated OrganizationWithCounteragentStatus Organizations = 1;
+}
+
+message LoginPassword {
+  required string Login = 1;
+  required string Password = 2;
+}
+
+message OrganizationList {
+  repeated Organization Organizations = 1;
+}
+
+message Organization {
+  required string OrgId = 1;
+  required string Inn = 2;
+  optional string Kpp = 3;
+  required string FullName = 4;
+  optional string ShortName = 5;
+  repeated Box Boxes = 7;
+  optional string Ogrn = 8;
+  optional string FnsParticipantId = 9;
+  optional Address Address = 10;
+  optional string FnsRegistrationDate = 11;
+  repeated Department Departments = 12;
+  optional string IfnsCode = 13;
+  optional bool IsPilot = 14;
+  optional bool IsActive = 15;
+  optional bool IsTest = 16;
+  optional bool IsBranch = 17;
+  optional bool IsRoaming = 18;
+  optional bool IsEmployee = 19;
+  optional int32 InvitationCount = 20;
+  optional int32 SearchCount = 21;
+  required Sociability Sociability = 22;
+  optional string LiquidationDate = 23;
+  optional string CertificateOfRegistryInfo = 24;
+  optional bool IsForeign = 25;
+  optional bool HasCertificateToSign = 26;
+}
+
+enum Sociability {
+  AllOrganizations = 0;
+  CounteragentsOnly = 1;
+}
+
+message Box {
+  required string BoxId = 1;
+  required string Title = 2;
+  optional Organization Organization = 3;
+  optional OrganizationInvoiceFormatVersion InvoiceFormatVersion = 4 [default = v5_02];
+  optional bool EncryptedDocumentsAllowed = 5;
+  required string BoxIdGuid = 6;
+}
+
+enum OrganizationInvoiceFormatVersion {
+  v5_01 = 1;
+  v5_02 = 2;
+}
+
+message OrganizationFeatures
+{
+  required BlockStatus BlockStatus = 1;
+  repeated string Features = 2;
+}
+
+message BlockStatus
+{
+  required ManualBlockStatus ManualBlockStatus = 1;
+  required AutoBlockStatus AutoBlockStatus = 2;
+}
+
+message ManualBlockStatus
+{
+  required bool IsBlocked = 1;
+  optional sfixed64 RequestedTicks = 2;
+}
+
+message AutoBlockStatus
+{
+  required bool IsBlocked = 1;
+}
+
+message Timestamp
+{
+  required sfixed64 Ticks = 1;
+}
+
+message AsyncMethodResult {
+  optional string TaskId = 1;
+}
+
+message AcquireCounteragentResult {
+  required string OrgId = 1;
+  optional DocumentId InvitationDocumentId = 2;
+}
+
+message Message {
+  required string MessageId = 1;
+  required sfixed64 TimestampTicks = 2;
+  required sfixed64 LastPatchTimestampTicks = 3;
+  required string FromBoxId = 4;
+  required string FromTitle = 5;
+  optional string ToBoxId = 6;
+  optional string ToTitle = 7;
+  repeated Entity Entities = 8;
+  optional bool IsDraft = 9 [default = false];
+  optional bool DraftIsLocked = 10 [default = false];
+  optional bool DraftIsRecycled = 11 [default = false];
+  optional string CreatedFromDraftId = 12;
+  repeated string DraftIsTransformedToMessageIdList = 13;
+  optional bool IsDeleted = 14 [default = false];
+  optional bool IsTest = 15 [default = false];
+  optional bool IsInternal = 16 [default = false];
+  optional bool IsProxified = 17 [default = false];
+  optional string ProxyBoxId = 18;
+  optional string ProxyTitle = 19;
+  optional bool PacketIsLocked = 20 [default = false];
+  required LockMode LockMode = 21;
+  required MessageType MessageType = 22;
+  optional TemplateToLetterTransformationInfo TemplateToLetterTransformationInfo = 23;
+  optional bool IsReusable = 24 [default = false];
+}
+
+enum LockMode
+{
+  None = 1;
+  Send = 2;
+  Full = 3;
+}
+
+enum MessageType {
+  UnknownMT= 0;
+  LetterMT = 1;
+  DraftMT = 2;
+  TemplateMT = 3;
+}
+
+message TemplateToLetterTransformationInfo
+{
+  required string LetterFromBoxId = 1;
+  required string LetterToBoxId = 2;
+  optional string LetterFromDepartmentId = 3;
+  optional string LetterToDepartmentId = 4;
+  optional string LetterProxyBoxId = 5;
+  optional string LetterProxyDepartmentId = 6;
+}
+
+message Entity {
+  optional EntityType EntityType = 1 [default = TypeUnknownEntity];
+  required string EntityId = 2;
+  optional string ParentEntityId = 3;
+  optional Content Content = 4;
+  optional AttachmentType AttachmentType = 5 [default = UnknownAttachmentType];
+  optional string FileName = 6;
+  optional bool NeedRecipientSignature = 7 [default = false];
+  optional string SignerBoxId = 8;
+  optional string NotDeliveredEventId = 10;
+  optional Document DocumentInfo = 11;
+  optional sfixed64 RawCreationDate = 12 [default = 0];
+  optional ResolutionInfo ResolutionInfo = 13;
+  optional string SignerDepartmentId = 14;
+  optional ResolutionRequestInfo ResolutionRequestInfo = 15;
+  optional ResolutionRequestDenialInfo ResolutionRequestDenialInfo = 16;
+  optional bool NeedReceipt = 17 [default = false];
+  optional string PacketId = 18;
+  optional bool IsApprovementSignature = 19 [default = false];
+  optional bool IsEncryptedContent = 20 [default = false];
+  optional string AttachmentVersion = 21;
+  optional ResolutionRouteAssignmentInfo ResolutionRouteAssignmentInfo = 22;
+  optional ResolutionRouteRemovalInfo ResolutionRouteRemovalInfo = 23;
+  optional CancellationInfo CancellationInfo = 24;
+  repeated string Labels = 25;
+  optional string Version = 26;
+  optional TemplateTransformationInfo TemplateTransformationInfo = 27;
+  optional TemplateRefusalInfo TemplateRefusalInfo = 28;
+  optional OuterDocflowInfo OuterDocflow = 29;
+  optional EntityRevocationRequestInfo RevocationRequestInfo = 30;
+  optional string ContentTypeId = 31;
+  optional PowerOfAttorneyInfo PowerOfAttorneyInfo = 32;
+}
+
+enum EntityType {
+  TypeUnknownEntity = 0; // Reserved type to report to legacy clients for newly introduced entity types
+  TypeAttachment = 1;
+  TypeSignature = 2;
+}
+
+enum AttachmentType {
+  UnknownAttachmentType = -1; // Reserved attachment type to report to legacy clients for newly introduced attachment types
+  NonformalizedType = 0;
+  InvoiceType = 1;
+  InvoiceReceiptType = 2;
+  InvoiceConfirmationType = 3;
+  InvoiceCorrectionRequestType = 4;
+  AttachmentCommentType = 5;
+  DeliveryFailureNotificationType = 6;
+  SignatureRequestRejectionType = 8;
+  SignatureVerificationReportType = 10;
+  TrustConnectionRequestType = 11;
+  Torg12Type = 12;
+  InvoiceRevisionType = 13;
+  InvoiceCorrectionType = 14;
+  InvoiceCorrectionRevisionType = 15;
+  AcceptanceCertificateType = 16;
+  StructuredDataType = 17;
+  ProformaInvoiceType = 18;
+  XmlTorg12Type = 19;
+  XmlAcceptanceCertificateType = 20;
+  XmlTorg12BuyerTitleType = 21;
+  XmlAcceptanceCertificateBuyerTitleType = 22;
+  Resolution = 23;
+  ResolutionRequest = 24;
+  ResolutionRequestDenialType = 25;
+  PriceListType = 26;
+  ReceiptType = 27;
+  XmlSignatureRejectionType = 28;
+  RevocationRequestType = 29;
+  PriceListAgreementType = 30;
+  CertificateRegistryType = 34;
+  ReconciliationActType = 35;
+  ContractType = 36;
+  Torg13Type = 37;
+  ServiceDetailsType = 38;
+  RoamingNotificationType = 39;
+  SupplementaryAgreementType = 40;
+  UniversalTransferDocumentType = 41;
+  UniversalTransferDocumentBuyerTitleType = 42;
+  UniversalTransferDocumentRevisionType = 45;
+  UniversalCorrectionDocumentType = 49;
+  UniversalCorrectionDocumentRevisionType = 50;
+  UniversalCorrectionDocumentBuyerTitleType = 51;
+  CustomDataType = 64;
+  MoveDocumentType = 65;
+  ResolutionRouteAssignmentType = 66;
+  ResolutionRouteRemovalType = 67;
+  TitleType = 68;
+  CancellationType = 69;
+  EditionType = 71;
+  DeletionRestorationType = 72;
+  TemplateTransformationType = 73;
+  TemplateRefusal = 74;
+  OuterDocflowType = 75;
+  RoamingConfirmationType = 76;
+  PowerOfAttorneyType = 77;
+  PowerOfAttorneyStatusType = 78;
+  // Неизвестные типы должны обрабатываться как Nonformalized
+}
+
+message Content
+{
+  required sfixed32 Size = 1;
+  optional bytes Data = 2;
+}
+
+message Document {
+  optional string IndexKey = 1;
+  required string MessageId = 2;
+  required string EntityId = 3;
+  required sfixed64 CreationTimestampTicks = 4;
+  optional string CounteragentBoxId = 5;
+  optional DocumentType DocumentType = 6 [default = UnknownDocumentTypeDT];
+  repeated DocumentId InitialDocumentIds = 7;
+  repeated DocumentId SubordinateDocumentIds = 8;
+  optional Content Content = 9;
+  optional string FileName = 10;
+  optional string DocumentDate = 11;
+  optional string DocumentNumber = 12;
+  optional NonformalizedDocumentMetadata NonformalizedDocumentMetadata = 13;
+  optional InvoiceMetadata InvoiceMetadata = 14;
+  optional TrustConnectionRequestMetadata TrustConnectionRequestMetadata = 15;
+  optional BasicDocumentMetadata Torg12Metadata = 16;
+  optional InvoiceRevisionMetadata InvoiceRevisionMetadata = 17;
+  optional InvoiceCorrectionMetadata InvoiceCorrectionMetadata = 18;
+  optional InvoiceCorrectionRevisionMetadata InvoiceCorrectionRevisionMetadata = 19;
+  optional AcceptanceCertificateMetadata AcceptanceCertificateMetadata = 20;
+  optional ProformaInvoiceMetadata ProformaInvoiceMetadata = 21;
+  optional BasicDocumentMetadata XmlTorg12Metadata = 22;
+  optional BasicDocumentMetadata XmlAcceptanceCertificateMetadata = 23;
+  optional bool IsDeleted = 24 [default = false];
+  optional string DepartmentId = 25;
+  optional bool IsTest = 26 [default = false];
+  optional string FromDepartmentId = 27;
+  optional string ToDepartmentId = 28;
+  optional PriceListMetadata PriceListMetadata = 29;
+  optional string CustomDocumentId = 30;
+  optional ResolutionStatus ResolutionStatus = 31;
+  optional RevocationStatus RevocationStatus  = 32 [default = UnknownRevocationStatus];
+  optional sfixed64 SendTimestampTicks = 33;
+  optional sfixed64 DeliveryTimestampTicks = 34;
+  repeated ForwardDocumentEvent ForwardDocumentEvents = 35;
+  optional BilateralDocumentMetadata ReconciliationActMetadata = 38;
+  optional ContractMetadata ContractMetadata = 39;
+  optional BasicDocumentMetadata Torg13Metadata = 40;
+  optional ServiceDetailsMetadata ServiceDetailsMetadata = 41;
+  optional RoamingNotificationStatus RoamingNotificationStatus = 42 [default = UnknownRoamingNotificationStatus];
+  optional bool HasCustomPrintForm = 43 [default = false]; // Deprecated
+  repeated CustomDataItem CustomData = 44;
+  optional string PacketId = 45;
+  optional DocumentDirection DocumentDirection = 46 [default = UnknownDocumentDirection];
+  optional sfixed64 LastModificationTimestampTicks = 47;
+  optional bool IsEncryptedContent = 48;
+  optional SenderSignatureStatus SenderSignatureStatus = 49 [default = UnknownSenderSignatureStatus];
+  optional SupplementaryAgreementMetadata SupplementaryAgreementMetadata = 50;
+  optional bool IsRead = 51 [default = false];
+  optional string RoamingNotificationStatusDescription = 52;
+  optional bool PacketIsLocked = 53 [default = false];
+  optional NonformalizedDocumentMetadata PriceListAgreementMetadata = 54;
+  optional NonformalizedDocumentMetadata CertificateRegistryMetadata = 55;
+  optional UniversalTransferDocumentMetadata UniversalTransferDocumentMetadata = 56;
+  optional UniversalTransferDocumentRevisionMetadata UniversalTransferDocumentRevisionMetadata = 57;
+  optional UniversalCorrectionDocumentMetadata UniversalCorrectionDocumentMetadata = 58;
+  optional UniversalCorrectionDocumentRevisionMetadata UniversalCorrectionDocumentRevisionMetadata = 59;
+  optional string ResolutionRouteId = 60 [default = ""];
+  optional string AttachmentVersion = 61;
+  optional ProxySignatureStatus ProxySignatureStatus = 62 [default = UnknownProxySignatureStatus];
+
+  required string TypeNamedId = 63;
+  required string Function = 64;
+  required int32 WorkflowId = 65;
+  required string Title = 66;
+  repeated MetadataItem Metadata = 67;
+  required RecipientReceiptMetadata RecipientReceiptMetadata = 68;
+  required ConfirmationMetadata ConfirmationMetadata = 69;
+  required RecipientResponseStatus RecipientResponseStatus = 70 [default = RecipientResponseStatusUnknown];
+  required AmendmentRequestMetadata AmendmentRequestMetadata = 71;
+  optional Origin Origin = 72;
+  optional string EditingSettingId = 73 [default = ""];
+  required LockMode LockMode = 74;
+  required SenderReceiptMetadata SenderReceiptMetadata = 75;
+  required string Version = 76;
+  repeated LastOuterDocflow LastOuterDocflows = 77;
+  optional string ProxyBoxId = 78;
+  optional string ProxyDepartmentId = 79;
+  required DocflowStatusV3 DocflowStatus = 80;
+}
+
+enum RoamingNotificationStatus {
+  UnknownRoamingNotificationStatus = 0; // Reserved status to report to legacy clients for newly introduced statuses
+  NotificationStatusNone = 1;
+  NotificationStatusSuccess = 2;
+  NotificationStatusError = 3;
+}
+
+message ResolutionInfo {
+  optional ResolutionType ResolutionType = 1 [default = UnknownResolutionType];
+  required string Author = 2; // ФИО согласователя
+  optional string InitialRequestId = 3;
+}
+
+enum ResolutionType {
+  UndefinedResolutionType = 0;
+  Approve = 1;
+  Disapprove = 2;
+  UnknownResolutionType = 3;
+}
+
+message ResolutionRequestInfo {
+  optional ResolutionRequestType RequestType = 1 [default = UnknownResolutionRequestType];
+  required string Author = 2;
+  optional ResolutionTarget Target = 3;
+  optional string ResolvedWith = 4;
+  repeated ResolutionAction Actions = 5;
+}
+
+enum ResolutionRequestType {
+  UnknownResolutionRequestType = -1;
+  ApprovementRequest = 0;
+  SignatureRequest = 1;
+  ApprovementSignatureRequest = 2;
+  Custom = 3;
+}
+
+message ResolutionTarget {
+  optional string Department = 1;
+  optional string DepartmentId = 2;
+  optional string User = 3;
+  optional string UserId = 4;
+}
+
+enum ResolutionAction {
+  UnknownAction = 0;
+  ApproveAction = 1;
+  DisapproveAction = 2;
+  SignWithApprovementSignature = 3;
+  SignWithPrimarySignature = 4;
+  DenySignatureRequest = 5;
+  RejectSigning = 6;
+}
+
+message ResolutionRequestDenialInfo {
+  required string Author = 1;
+  optional string InitialRequestId = 2;
+}
+
+message ResolutionRequestDenialAttachment {
+  required string InitialResolutionRequestId = 1;
+  optional string Comment = 2;
+  repeated string Labels = 3;
+}
+
+message ResolutionRequestDenialCancellationAttachment {
+  required string InitialResolutionRequestDenialId = 1;
+}
+
+message ResolutionRouteAssignmentInfo {
+  required string RouteId = 1;
+  required string Author = 2;
+}
+
+message ResolutionRouteRemovalInfo {
+  required string RouteId = 1;
+  required string Author = 2;
+}
+
+message CancellationInfo {
+  required string Author = 1;
+}
+
+message TemplateTransformationInfo
+{
+  optional DocumentId TransformedToLetterId = 1;
+  optional string Author = 2;
+}
+
+message TemplateRefusalInfo {
+  required TemplateRefusalType Type = 1 [default = UnknownTemplateRefusalType];
+  required string BoxId = 2;
+  optional string Author = 3;
+  optional string Comment = 4;
+}
+
+enum TemplateRefusalType {
+  UnknownTemplateRefusalType = 0;
+  Refusal = 1;
+  Withdrawal = 2;
+}
+
+message OuterDocflowInfo {
+  required string DocflowNamedId = 1;
+  required string DocflowFriendlyName = 2;
+  required Status Status = 3;
+}
+
+message Status {
+  required string NamedId = 1;
+  required string FriendlyName = 2;
+  required OuterStatusType Type = 3;
+  optional string Description = 4;
+  repeated StatusDetail Details = 5;
+}
+
+message StatusDetail {
+  optional string Code = 1;
+  optional string Text = 2;
+}
+
+enum OuterStatusType {
+  UnknownStatusType = 0;
+  NormalType = 1;
+  SuccessType = 2;
+  WarningType = 3;
+  ErrorType = 4;
+}
+
+message EntityRevocationRequestInfo {
+  required string InitiatorBoxId  = 1;
+}
+
+message PowerOfAttorneyInfo {
+  required PowerOfAttorneyFullId FullId = 1;
+  optional PowerOfAttorneyValidationStatus Status = 2;
+}
+
+enum DocumentType
+{
+  UnknownDocumentTypeDT = -1;
+  NonformalizedDT = 0;
+  InvoiceDT = 1;
+  TrustConnectionRequestDT = 11;
+  Torg12DT = 12;
+  InvoiceRevisionDT = 13;
+  InvoiceCorrectionDT = 14;
+  InvoiceCorrectionRevisionDT = 15;
+  AcceptanceCertificateDT = 16;
+  ProformaInvoiceDT = 18;
+  XmlTorg12DT = 19;
+  XmlAcceptanceCertificateDT = 20;
+  PriceListDT = 26;
+  PriceListAgreementDT = 30;
+  CertificateRegistryDT = 34;
+  ReconciliationActDT = 35;
+  ContractDT= 36;
+  Torg13DT = 37;
+  ServiceDetailsDT = 38;
+  SupplementaryAgreementDT = 40;
+  UniversalTransferDocumentDT = 41;
+  UniversalTransferDocumentRevisionDT = 45;
+  UniversalCorrectionDocumentDT = 49;
+  UniversalCorrectionDocumentRevisionDT = 50;
+}
+
+message NonformalizedDocumentMetadata {
+  optional NonformalizedDocumentStatus DocumentStatus = 1 [default = UnknownNonformalizedDocumentStatus];
+  optional ReceiptStatus ReceiptStatus = 2 [default = UnknownReceiptStatusReceiptStatus];
+}
+
+enum NonformalizedDocumentStatus {
+  UnknownNonformalizedDocumentStatus = 0;
+  OutboundNoRecipientSignatureRequestDocumentStatus = 1;
+  OutboundWaitingForRecipientSignatureDocumentStatus = 2;
+  OutboundWithRecipientSignatureDocumentStatus = 3;
+  OutboundRecipientSignatureRequestRejectedDocumentStatus = 4;
+  OutboundWaitingForSenderSignatureDocumentStatus = 13;
+  OutboundInvalidSenderSignatureDocumentStatus = 14;
+  InboundNoRecipientSignatureRequestDocumentStatus = 5;
+  InboundWaitingForRecipientSignatureDocumentStatus = 6;
+  InboundWithRecipientSignatureDocumentStatus = 7;
+  InboundRecipientSignatureRequestRejectedDocumentStatus = 8;
+  InboundInvalidRecipientSignatureDocumentStatus = 15;
+  InternalNoRecipientSignatureRequestDocumentStatus = 9;
+  InternalWaitingForRecipientSignatureDocumentStatus = 10;
+  InternalWithRecipientSignatureDocumentStatus = 11;
+  InternalRecipientSignatureRequestRejectedDocumentStatus = 12;
+  InternalWaitingForSenderSignatureDocumentStatus = 16;
+  InternalInvalidSenderSignatureDocumentStatus = 17;
+  InternalInvalidRecipientSignatureDocumentStatus = 18;
+}
+
+message InvoiceMetadata {
+  optional InvoiceStatus InvoiceStatus = 1 [default = UnknownInvoiceStatus];
+  required string Total = 2;
+  required string Vat = 3;
+  required int32 Currency = 4;
+  required sfixed64 ConfirmationDateTimeTicks = 5;
+  required int32 InvoiceAmendmentFlags = 6;
+}
+
+message InvoiceRevisionMetadata {
+  optional InvoiceStatus InvoiceRevisionStatus = 1 [default = UnknownInvoiceStatus];
+  required string OriginalInvoiceNumber = 2;
+  required string OriginalInvoiceDate = 3;
+  required string Total = 4;
+  required string Vat = 5;
+  required int32 Currency = 6;
+  required sfixed64 ConfirmationDateTimeTicks = 7;
+  required int32 InvoiceAmendmentFlags = 8;
+}
+
+message InvoiceCorrectionMetadata {
+  optional InvoiceStatus InvoiceCorrectionStatus = 1 [default = UnknownInvoiceStatus];
+  required string OriginalInvoiceNumber = 2;
+  required string OriginalInvoiceDate = 3;
+  optional string OriginalInvoiceRevisionNumber = 4;
+  optional string OriginalInvoiceRevisionDate = 5;
+  required string TotalInc = 6;
+  required string TotalDec = 7;
+  required string VatInc = 8;
+  required string VatDec = 9;
+  required int32 Currency = 10;
+  required sfixed64 ConfirmationDateTimeTicks = 11;
+  required int32 InvoiceAmendmentFlags = 12;
+}
+
+message InvoiceCorrectionRevisionMetadata {
+  optional InvoiceStatus InvoiceCorrectionRevisionStatus = 1 [default = UnknownInvoiceStatus];
+  required string OriginalInvoiceNumber = 2;
+  required string OriginalInvoiceDate = 3;
+  optional string OriginalInvoiceRevisionNumber = 4;
+  optional string OriginalInvoiceRevisionDate = 5;
+  required string OriginalInvoiceCorrectionNumber = 6;
+  required string OriginalInvoiceCorrectionDate = 7;
+  required string TotalInc = 8;
+  required string TotalDec = 9;
+  required string VatInc = 10;
+  required string VatDec = 11;
+  required int32 Currency = 12;
+  required sfixed64 ConfirmationDateTimeTicks = 13;
+  required int32 InvoiceAmendmentFlags = 14;
+}
+
+enum InvoiceStatus {
+  UnknownInvoiceStatus = 0;
+  OutboundWaitingForInvoiceReceipt = 1;
+  OutboundNotFinished = 2;
+  OutboundFinished = 3;
+  OutboundWaitingForSenderSignature = 6;
+  OutboundInvalidSenderSignature = 7;
+  InboundNotFinished = 4;
+  InboundFinished = 5;
+}
+
+message TrustConnectionRequestMetadata {
+  optional BilateralDocumentStatus TrustConnectionRequestStatus = 1 [default = UnknownBilateralDocumentStatusBilateralDocumentStatus];
+}
+
+message BasicDocumentMetadata {
+  optional BilateralDocumentStatus DocumentStatus = 1 [default = UnknownBilateralDocumentStatusBilateralDocumentStatus];
+  required string Total = 2;
+  optional string Vat = 3;
+  optional string Grounds = 4;
+  optional ReceiptStatus ReceiptStatus = 5 [default = UnknownReceiptStatusReceiptStatus];
+}
+
+message PriceListMetadata {
+  required BilateralDocumentStatus DocumentStatus = 1;
+  optional string PriceListEffectiveDate = 2;
+  optional string ContractDocumentDate = 3;
+  optional string ContractDocumentNumber = 4;
+}
+
+message ContractMetadata {
+  optional BilateralDocumentStatus DocumentStatus = 1 [default = UnknownBilateralDocumentStatusBilateralDocumentStatus];
+  optional string ContractPrice = 2;
+  optional string ContractType = 3;
+  optional ReceiptStatus ReceiptStatus = 4 [default = UnknownReceiptStatusReceiptStatus];
+}
+
+message BilateralDocumentMetadata {
+  optional BilateralDocumentStatus DocumentStatus = 1 [default = UnknownBilateralDocumentStatusBilateralDocumentStatus];
+  optional ReceiptStatus ReceiptStatus = 2 [default =  UnknownReceiptStatusReceiptStatus]; // Reserved state to report to legacy client for new statuses
+}
+
+enum BilateralDocumentStatus {
+  UnknownBilateralDocumentStatusBilateralDocumentStatus = 0;
+  OutboundWaitingForRecipientSignatureBilateralDocumentStatus = 1;
+  OutboundWithRecipientSignatureBilateralDocumentStatus = 2;
+  OutboundRecipientSignatureRequestRejectedBilateralDocumentStatus = 3;
+  OutboundWaitingForSenderSignatureBilateralDocumentStatus = 10;
+  OutboundInvalidSenderSignatureBilateralDocumentStatus = 11;
+  InboundWaitingForRecipientSignatureBilateralDocumentStatus = 4;
+  InboundWithRecipientSignatureBilateralDocumentStatus = 5;
+  InboundRecipientSignatureRequestRejectedBilateralDocumentStatus = 6;
+  InboundInvalidRecipientSignatureBilateralDocumentStatus = 12;
+  InternalWaitingForRecipientSignatureBilateralDocumentStatus = 7;
+  InternalWithRecipientSignatureBilateralDocumentStatus = 8;
+  InternalRecipientSignatureRequestRejectedBilateralDocumentStatus = 9;
+  InternalWaitingForSenderSignatureBilateralDocumentStatus = 13;
+  InternalInvalidSenderSignatureBilateralDocumentStatus = 14;
+  InternalInvalidRecipientSignatureBilateralDocumentStatus = 15;
+}
+
+enum ReceiptStatus {
+  UnknownReceiptStatusReceiptStatus = 0; // Reserved state to report to legacy client for new statuses
+  ReceiptStatusNoneReceiptStatus = 1;
+  ReceiptStatusFinishedReceiptStatus = 2;
+  ReceiptStatusHaveToCreateReceiptReceiptStatus = 3;
+  ReceiptStatusWaitingForReceiptReceiptStatus = 4;
+}
+
+message AcceptanceCertificateMetadata {
+  optional AcceptanceCertificateDocumentStatus DocumentStatus = 1 [default = UnknownAcceptanceCertificateDocumentStatusAcceptanceCertificateDocumentStatus];
+  required string Total = 2;
+  optional string Vat = 3;
+  optional string Grounds = 4;
+  optional ReceiptStatus ReceiptStatus = 5 [default = UnknownReceiptStatusReceiptStatus];
+}
+
+enum AcceptanceCertificateDocumentStatus {
+  UnknownAcceptanceCertificateDocumentStatusAcceptanceCertificateDocumentStatus = 0; // Reserved status to report to legacy clients for newly introduced statuses
+  OutboundWaitingForRecipientSignatureAcceptanceCertificateDocumentStatus = 1;
+  OutboundWithRecipientSignatureAcceptanceCertificateDocumentStatus = 2;
+  OutboundRecipientSignatureRequestRejectedAcceptanceCertificateDocumentStatus = 3;
+  OutboundWaitingForSenderSignatureAcceptanceCertificateDocumentStatus = 10;
+  OutboundInvalidSenderSignatureAcceptanceCertificateDocumentStatus = 11;
+  OutboundNoRecipientSignatureRequestAcceptanceCertificateDocumentStatus = 16;
+  InboundWaitingForRecipientSignatureAcceptanceCertificateDocumentStatus = 4;
+  InboundWithRecipientSignatureAcceptanceCertificateDocumentStatus = 5;
+  InboundRecipientSignatureRequestRejectedAcceptanceCertificateDocumentStatus = 6;
+  InboundInvalidRecipientSignatureAcceptanceCertificateDocumentStatus = 12;
+  InboundNoRecipientSignatureRequestAcceptanceCertificateDocumentStatus = 17;
+  InternalWaitingForRecipientSignatureAcceptanceCertificateDocumentStatus = 7;
+  InternalWithRecipientSignatureAcceptanceCertificateDocumentStatus = 8;
+  InternalRecipientSignatureRequestRejectedAcceptanceCertificateDocumentStatus = 9;
+  InternalWaitingForSenderSignatureAcceptanceCertificateDocumentStatus = 13;
+  InternalInvalidSenderSignatureAcceptanceCertificateDocumentStatus = 14;
+  InternalInvalidRecipientSignatureAcceptanceCertificateDocumentStatus = 15;
+  InternalNoRecipientSignatureRequestAcceptanceCertificateDocumentStatus = 18;
+}
+
+message SupplementaryAgreementMetadata {
+  optional BilateralDocumentStatus DocumentStatus = 1 [default = UnknownBilateralDocumentStatusBilateralDocumentStatus];
+  optional string Total = 2;
+  optional string ContractType = 3;
+  required string ContractNumber = 4;
+  required string ContractDate = 5;
+  optional ReceiptStatus ReceiptStatus = 6 [default = UnknownReceiptStatusReceiptStatus];
+}
+
+enum UniversalTransferDocumentStatus {
+  UnknownDocumentStatusUniversalTransferDocumentStatus = 0;
+  OutboundWaitingForSenderSignatureUniversalTransferDocumentStatus = 1;
+  OutboundWaitingForInvoiceReceiptAndRecipientSignatureUniversalTransferDocumentStatus = 2;
+  OutboundWaitingForInvoiceReceiptUniversalTransferDocumentStatus = 3;
+  OutboundWaitingForRecipientSignatureUniversalTransferDocumentStatus = 4;
+  OutboundInvalidSenderSignatureUniversalTransferDocumentStatus = 5;
+  InboundWaitingForInvoiceReceiptAndRecipientSignatureUniversalTransferDocumentStatus = 6;
+  InboundWaitingForRecipientSignatureUniversalTransferDocumentStatus = 7;
+  InboundWaitingForInvoiceReceiptUniversalTransferDocumentStatus = 8;
+  InboundWithRecipientSignatureUniversalTransferDocumentStatus = 9;
+  InboundInvalidRecipientSignatureUniversalTransferDocumentStatus = 10;
+}
+
+message ProformaInvoiceMetadata {
+  optional UnilateralDocumentStatus DocumentStatus = 1 [default = UnknownUnilateralDocumentStatusUnilateralDocumentStatus];
+  required string Total = 2;
+  optional string Vat = 3;
+  optional string Grounds = 4;
+}
+
+message ServiceDetailsMetadata {
+  optional UnilateralDocumentStatus DocumentStatus = 1 [default = UnknownUnilateralDocumentStatusUnilateralDocumentStatus];
+}
+
+enum UnilateralDocumentStatus {
+  UnknownUnilateralDocumentStatusUnilateralDocumentStatus = 0;
+  OutboundUnilateralDocumentStatus = 1;
+  OutboundWaitingForSenderSignatureUnilateralDocumentStatus = 4;
+  OutboundInvalidSenderSignatureUnilateralDocumentStatus = 5;
+  InboundUnilateralDocumentStatus = 2;
+  InternalUnilateralDocumentStatus = 3;
+  InternalWaitingForSenderSignatureUnilateralDocumentStatus = 6;
+  InternalInvalidSenderSignatureUnilateralDocumentStatus = 7;
+}
+
+message ResolutionStatus {
+  required ResolutionStatusType Type = 1;
+  optional ResolutionTarget Target = 2;
+  required string AuthorUserId = 3;
+  required string AuthorFIO = 4;
+}
+
+enum ResolutionStatusType {
+  NoneResolutionStatusType = 0;
+  ApprovedResolutionStatusType = 1;
+  DisapprovedResolutionStatusType = 2;
+  ApprovementRequestedResolutionStatusType = 3;
+  SignatureRequestedResolutionStatusType = 4;
+  SignatureDeniedResolutionStatusType = 5;
+  ActionsRequestedResolutionStatusType = 6;
+}
+
+enum RevocationStatus {
+  UnknownRevocationStatus = 0;
+  RevocationStatusNone = 1;
+  RevocationIsRequestedByMe = 2;
+  RequestsMyRevocation = 3;
+  RevocationAccepted = 4;
+  RevocationRejected = 5;
+}
+
+message ForwardDocumentEvent
+{
+  optional Timestamp Timestamp = 1;
+  optional string ToBoxId = 2;
+}
+
+message CustomDataItem
+{
+  required string Key = 1;
+  optional string Value = 2;
+}
+
+enum DocumentDirection
+{
+  UnknownDocumentDirection = 0;
+  Inbound = 1;
+  Outbound = 2;
+  Internal = 3;
+}
+
+enum SenderSignatureStatus {
+  UnknownSenderSignatureStatus = 0;
+  WaitingForSenderSignature = 1;
+  SenderSignatureUnchecked = 2;
+  SenderSignatureCheckedAndValid = 3;
+  SenderSignatureCheckedAndInvalid = 4;
+}
+
+message UniversalTransferDocumentMetadata {
+  optional UniversalTransferDocumentStatus DocumentStatus = 1 [default = UnknownDocumentStatusUniversalTransferDocumentStatus];
+  required string Total = 2; // TotalSum;
+  optional string Vat = 3; //TotalVat;
+  optional string Grounds = 4; // DocumentGrounds
+  required string DocumentFunction = 5;
+  required int32 Currency = 6;
+  optional sfixed64 ConfirmationDateTimeTicks = 8;
+  optional int32 InvoiceAmendmentFlags = 9;
+}
+
+message UniversalTransferDocumentRevisionMetadata {
+  required UniversalTransferDocumentStatus DocumentStatus = 1;
+  required string Total = 2; // TotalSum;
+  optional string Vat = 3; //TotalVat;
+  optional string Grounds = 4; // DocumentGrounds
+  required string DocumentFunction = 5;
+  required int32 Currency = 6;
+  optional sfixed64 ConfirmationDateTimeTicks = 7;
+  required int32 InvoiceAmendmentFlags = 8;
+  required string OriginalInvoiceNumber = 9;
+  required string OriginalInvoiceDate = 10;
+}
+
+message UniversalCorrectionDocumentMetadata {
+  required UniversalTransferDocumentStatus DocumentStatus = 1;
+  required string TotalInc = 2;
+  required string TotalDec = 3;
+  required string VatInc = 4;
+  required string VatDec = 5;
+  optional string Grounds = 6; // DocumentGrounds
+  required string DocumentFunction = 7;
+  required int32 Currency = 8;
+  required sfixed64 ConfirmationDateTimeTicks = 9;
+  required int32 InvoiceAmendmentFlags = 10;
+  required string OriginalInvoiceNumber = 11;
+  required string OriginalInvoiceDate = 12;
+  optional string OriginalInvoiceRevisionNumber = 13;
+  optional string OriginalInvoiceRevisionDate = 14;
+}
+
+message UniversalCorrectionDocumentRevisionMetadata {
+  required UniversalTransferDocumentStatus DocumentStatus = 1;
+  required string TotalInc = 2;
+  required string TotalDec = 3;
+  required string VatInc = 4;
+  required string VatDec = 5;
+  optional string Grounds = 6; // DocumentGrounds
+  required string DocumentFunction = 7;
+  required int32 Currency = 8;
+  required sfixed64 ConfirmationDateTimeTicks = 9;
+  required int32 InvoiceAmendmentFlags = 10;
+  required string OriginalInvoiceNumber = 11;
+  required string OriginalInvoiceDate = 12;
+  optional string OriginalInvoiceRevisionNumber = 13;
+  optional string OriginalInvoiceRevisionDate = 14;
+  required string OriginalInvoiceCorrectionNumber = 15;
+  required string OriginalInvoiceCorrectionDate = 16;
+}
+
+enum ProxySignatureStatus {
+  UnknownProxySignatureStatus = 0;
+  ProxySignatureStatusNone = 1;
+  WaitingForProxySignature = 2;
+  WithProxySignature = 3;
+  ProxySignatureRejected = 4;
+  InvalidProxySignature = 5;
+}
+
+message MetadataItem {
+  required string Key = 1;
+  required string Value = 2;
+}
+
+message RecipientReceiptMetadata {
+  required GeneralReceiptStatus ReceiptStatus = 1;
+  required ConfirmationMetadata ConfirmationMetadata = 2;
+}
+
+enum GeneralReceiptStatus {
+  GeneralReceiptStatusUnknown = 0;
+  GeneralReceiptStatusNotAcceptable = 1;
+  HaveToCreateReceipt = 2;
+  WaitingForReceipt = 3;
+  Finished = 4;
+}
+
+message ConfirmationMetadata {
+  required GeneralReceiptStatus ReceiptStatus = 1;
+  required sfixed64 DateTimeTicks = 2;
+}
+
+enum RecipientResponseStatus {
+  RecipientResponseStatusUnknown = 0;
+  RecipientResponseStatusNotAcceptable = 1;
+  WaitingForRecipientSignature = 2;
+  WithRecipientSignature = 3;
+  RecipientSignatureRequestRejected = 4;
+  InvalidRecipientSignature = 5;
+  WithRecipientPartiallySignature = 6;
+}
+
+message AmendmentRequestMetadata {
+  required int32 AmendmentFlags = 1;
+  required GeneralReceiptStatus ReceiptStatus = 2;
+}
+
+message Origin {
+  required MessageType MessageType = 1;
+  required string MessageId = 2;
+}
+
+message SenderReceiptMetadata {
+  required GeneralReceiptStatus ReceiptStatus = 1;
+}
+
+message LastOuterDocflow {
+  required string ParentEntityId = 1;
+  required OuterDocflowInfo OuterDocflow = 2;
+}
+
+message DocflowStatusV3
+{
+  required DocflowStatusModelV3 PrimaryStatus = 1;
+  optional DocflowStatusModelV3 SecondaryStatus = 2;
+  optional PowerOfAttorneyValidationStatus PowerOfAttorneyGeneralStatus = 3;
+}
+
+message DocflowStatusModelV3
+{
+  optional string Severity = 1;
+  optional string StatusText = 2;
+}
+
+message MessageToPost {
+  required string FromBoxId = 1;
+  optional string ToBoxId = 2;
+  repeated XmlDocumentAttachment Invoices = 3; // Устаревшая структура
+  repeated NonformalizedAttachment NonformalizedDocuments = 4; // Устаревшая структура
+  repeated BasicDocumentAttachment Torg12Documents = 5; // Устаревшая структура
+  optional TrustConnectionRequestAttachment TrustConnectionRequest = 6; // Устаревшая структура
+  repeated AcceptanceCertificateAttachment AcceptanceCertificates = 7; // Устаревшая структура
+  repeated StructuredDataAttachment StructuredDataAttachments = 8;
+  repeated BasicDocumentAttachment ProformaInvoices = 9; // Устаревшая структура
+  repeated XmlDocumentAttachment XmlTorg12SellerTitles = 10; // Устаревшая структура
+  repeated XmlDocumentAttachment XmlAcceptanceCertificateSellerTitles = 11; // Устаревшая структура
+  optional string ToDepartmentId = 12;
+  optional bool IsDraft = 13 [default = false];
+  optional bool LockDraft = 14 [default = false];
+  optional bool StrictDraftValidation = 15 [default = true];
+  optional bool IsInternal = 16 [default = false];
+  optional string FromDepartmentId = 17;
+  optional bool DelaySend = 18 [default = false];
+  repeated PriceListAttachment PriceLists = 19; // Устаревшая структура
+  repeated NonformalizedAttachment PriceListAgreements = 20; // Устаревшая структура
+  repeated NonformalizedAttachment CertificateRegistries = 21; // Устаревшая структура
+  repeated ReconciliationActAttachment ReconciliationActs = 22; // Устаревшая структура
+  repeated ContractAttachment Contracts = 23; // Устаревшая структура
+  repeated Torg13Attachment Torg13Documents = 24; // Устаревшая структура
+  repeated ServiceDetailsAttachment ServiceDetailsDocuments = 25; // Устаревшая структура
+  optional string ProxyBoxId = 26;
+  optional string ProxyDepartmentId = 27;
+  repeated EncryptedInvoiceAttachment EncryptedInvoices = 28; // Устаревшая структура
+  repeated EncryptedXmlDocumentAttachment EncryptedXmlTorg12SellerTitles = 29; // Устаревшая структура
+  repeated EncryptedXmlDocumentAttachment EncryptedXmlAcceptanceCertificateSellerTitles = 30; // Устаревшая структура
+  repeated SupplementaryAgreementAttachment SupplementaryAgreements = 31; // Устаревшая структура
+  optional bool LockPacket = 32 [default = false];
+  repeated XmlDocumentAttachment UniversalTransferDocumentSellerTitles = 33; // Устаревшая структура
+  repeated DocumentAttachment DocumentAttachments = 34;
+  optional LockMode LockMode = 35 [default = None];
+}
+
+message XmlDocumentAttachment {
+  required SignedContent SignedContent = 1;
+  optional string Comment = 3;
+  repeated DocumentId InitialDocumentIds = 4;
+  repeated DocumentId SubordinateDocumentIds = 5;
+  optional string CustomDocumentId = 6;
+  optional bool NeedReceipt = 7 [default = false];
+  repeated CustomDataItem CustomData = 8;
+}
+
+message NonformalizedAttachment {
+  required SignedContent SignedContent = 1;
+  required string FileName = 2;
+  optional string Comment = 3;
+  optional bool NeedRecipientSignature = 4 [default = false];
+  repeated DocumentId InitialDocumentIds = 5;
+  repeated DocumentId SubordinateDocumentIds = 6;
+  optional string DocumentDate = 7;
+  optional string DocumentNumber = 8;
+  optional string CustomDocumentId = 9;
+  optional bool NeedReceipt = 10 [default = false];
+  repeated CustomDataItem CustomData = 11;
+}
+
+message BasicDocumentAttachment {
+  required SignedContent SignedContent = 1;
+  required string FileName = 2;
+  optional string Comment = 3;
+  repeated DocumentId InitialDocumentIds = 4;
+  repeated DocumentId SubordinateDocumentIds = 5;
+  required string DocumentDate = 6;
+  required string DocumentNumber = 7;
+  required string Total = 8;
+  optional string CustomDocumentId = 9;
+  optional string Vat = 10;
+  optional string Grounds = 11;
+  optional bool NeedReceipt = 12 [default = false];
+  repeated CustomDataItem CustomData = 13;
+}
+
+message TrustConnectionRequestAttachment {
+  required SignedContent SignedContent = 1;
+  required string FileName = 2;
+  optional string Comment = 3;
+  optional string CustomDocumentId = 4;
+  repeated CustomDataItem CustomData = 5;
+}
+
+message AcceptanceCertificateAttachment {
+  required SignedContent SignedContent = 1;
+  required string FileName = 2;
+  optional string Comment = 3;
+  repeated DocumentId InitialDocumentIds = 4;
+  repeated DocumentId SubordinateDocumentIds = 5;
+  required string DocumentDate = 6;
+  optional string DocumentNumber = 7;
+  required string Total = 8;
+  optional string CustomDocumentId = 9;
+  optional string Vat = 10;
+  optional string Grounds = 11;
+  optional bool NeedReceipt = 12 [default = false];
+  optional bool NeedRecipientSignature = 13 [default = true];
+  repeated CustomDataItem CustomData = 14;
+}
+
+message StructuredDataAttachment {
+  required bytes Content = 1;
+  required string FileName = 2;
+  required string DocumentId = 3;
+}
+
+message PriceListAttachment {
+  required SignedContent SignedContent = 1;
+  required string FileName = 2;
+  optional string Comment = 3;
+  repeated DocumentId InitialDocumentIds = 4;
+  repeated DocumentId SubordinateDocumentIds = 5;
+  optional string CustomDocumentId = 6;
+  required string DocumentDate = 7;
+  required string DocumentNumber = 8;
+  required string PriceListEffectiveDate = 9;
+  required string ContractDocumentDate = 10;
+  required string ContractDocumentNumber = 11;
+  optional bool NeedReceipt = 12 [default = false];
+  repeated CustomDataItem CustomData = 13;
+}
+
+message ReconciliationActAttachment {
+  required SignedContent SignedContent = 1;
+  required string FileName = 2;
+  optional string Comment = 3;
+  repeated DocumentId InitialDocumentIds = 5;
+  repeated DocumentId SubordinateDocumentIds = 6;
+  required string DocumentDate = 7;
+  optional string DocumentNumber = 8;
+  optional string CustomDocumentId = 9;
+  optional bool NeedReceipt = 10 [default = false];
+  repeated CustomDataItem CustomData = 11;
+}
+
+message ContractAttachment {
+  required SignedContent SignedContent = 1;
+  required string FileName = 2;
+  optional string Comment = 3;
+  repeated DocumentId InitialDocumentIds = 4;
+  repeated DocumentId SubordinateDocumentIds = 5;
+  optional string CustomDocumentId = 6;
+  required string DocumentDate = 7;
+  required string DocumentNumber = 8;
+  optional string ContractPrice = 9;
+  optional string ContractType = 10;
+  optional bool NeedReceipt = 11 [default = false];
+  repeated CustomDataItem CustomData = 12;
+}
+
+message Torg13Attachment {
+  required SignedContent SignedContent = 1;
+  required string FileName = 2;
+  optional string Comment = 3;
+  repeated DocumentId InitialDocumentIds = 4;
+  repeated DocumentId SubordinateDocumentIds = 5;
+  required string DocumentDate = 6;
+  required string DocumentNumber = 7;
+  required string Total = 8;
+  optional string CustomDocumentId = 9;
+  optional string Grounds = 11;
+  optional bool NeedReceipt = 12 [default = false];
+  repeated CustomDataItem CustomData = 13;
+}
+
+message ServiceDetailsAttachment {
+  required SignedContent SignedContent = 1;
+  required string FileName = 2;
+  optional string Comment = 3;
+  repeated DocumentId InitialDocumentIds = 5;
+  repeated DocumentId SubordinateDocumentIds = 6;
+  optional string DocumentDate = 7;
+  optional string DocumentNumber = 8;
+  optional string CustomDocumentId = 9;
+  optional bool NeedReceipt = 10 [default = false];
+  repeated CustomDataItem CustomData = 11;
+}
+
+message EncryptedInvoiceAttachment {
+  required SignedContent SignedContent = 1;
+  optional string Comment = 3;
+  repeated DocumentId InitialDocumentIds = 4;
+  repeated DocumentId SubordinateDocumentIds = 5;
+  optional string CustomDocumentId = 6;
+  repeated CustomDataItem CustomData = 7;
+  required EncryptedDocumentMetadata Metadata = 8;
+  optional EncryptedInvoiceMetadata InvoiceMetadata = 9;
+  optional EncryptedInvoiceCorrectionMetadata InvoiceCorrectionMetadata = 10;
+}
+
+message EncryptedDocumentMetadata {
+  required string FileId = 1;
+  required string BuyerFnsParticipantId = 2;
+  required string SenderFnsParticipantId = 3;
+  required DocumentDateAndNumber DocumentDateAndNumber = 4;
+}
+
+message EncryptedInvoiceMetadata {
+  optional DocumentDateAndNumber RevisionDateAndNumber = 1;
+}
+
+message EncryptedInvoiceCorrectionMetadata {
+  required DocumentDateAndNumber OriginalInvoiceDateAndNumber = 1;
+  optional DocumentDateAndNumber OriginalInvoiceRevisionDateAndNumber = 2;
+  optional DocumentDateAndNumber InvoiceCorrectionRevisionDateAndNumber = 3;
+}
+
+message DocumentDateAndNumber
+{
+  optional string DocumentDate = 1;
+  optional string DocumentNumber = 2;
+}
+
+message EncryptedXmlDocumentAttachment {
+  required SignedContent SignedContent = 1;
+  optional string Comment = 3;
+  repeated DocumentId InitialDocumentIds = 4;
+  repeated DocumentId SubordinateDocumentIds = 5;
+  optional string CustomDocumentId = 6;
+  repeated CustomDataItem CustomData = 7;
+  required EncryptedDocumentMetadata Metadata = 8;
+  required EncryptedXmlBasicDocumentMetadata XmlBasicMetadata = 9;
+}
+
+message EncryptedXmlBasicDocumentMetadata {
+  required string FormationDate = 1;
+  required string FormationTime = 2;
+  optional string DocumentName = 3;
+}
+
+message SupplementaryAgreementAttachment {
+  required SignedContent SignedContent = 1;
+  required string FileName = 2;
+  optional string Comment = 3;
+  repeated DocumentId InitialDocumentIds = 4;
+  repeated DocumentId SubordinateDocumentIds = 5;
+  optional string CustomDocumentId = 6;
+  required string DocumentDate = 7;
+  required string DocumentNumber = 8;
+  optional string Total = 9;
+  required string ContractNumber = 10;
+  required string ContractDate = 11;
+  optional string ContractType = 12;
+  optional bool NeedReceipt = 13 [default = false];
+  repeated CustomDataItem CustomData = 14;
+}
+
+message DocumentAttachment {
+  required SignedContent SignedContent = 1;
+  optional string Comment = 3;
+  optional bool NeedRecipientSignature = 4 [default = false];
+  repeated DocumentId InitialDocumentIds = 5;
+  repeated DocumentId SubordinateDocumentIds = 6;
+  optional string CustomDocumentId = 9;
+  optional bool NeedReceipt = 10 [default = false];
+  repeated CustomDataItem CustomData = 11;
+  required string TypeNamedId = 12;
+  optional string Function = 13;
+  optional string Version = 14;
+  repeated MetadataItem Metadata = 15;
+  optional int32 WorkflowId = 16;
+  optional bool IsEncrypted = 17 [default = false];
+  optional string EditingSettingId = 18;
+}
+
+message MessagePatchToPost {
+  required string BoxId = 1;
+  required string MessageId = 2;
+  repeated ReceiptAttachment Receipts = 3;
+  repeated CorrectionRequestAttachment CorrectionRequests = 4;
+  repeated DocumentSignature Signatures = 5;
+  repeated RequestedSignatureRejection RequestedSignatureRejections = 6;  // Устаревшая структура
+  repeated RecipientTitleAttachment XmlTorg12BuyerTitles = 7;
+  repeated RecipientTitleAttachment XmlAcceptanceCertificateBuyerTitles = 8;
+  repeated ResolutionAttachment Resolutions = 9;
+  repeated ResolutionRequestAttachment ResolutionRequests = 10;
+  repeated ResolutionRequestCancellationAttachment ResolutionRequestCancellations = 11;
+  repeated ResolutionRequestDenialAttachment ResolutionRequestDenials = 12;
+  repeated ResolutionRequestDenialCancellationAttachment ResolutionRequestDenialCancellations = 13;
+  repeated RevocationRequestAttachment RevocationRequests = 14;
+  repeated XmlSignatureRejectionAttachment XmlSignatureRejections = 15;
+  repeated CustomDataPatch CustomDataPatches = 16;
+  repeated ResolutionRouteAssignment ResolutionRouteAssignments = 17;
+  repeated SignatureVerification SignatureVerifications = 18;
+  repeated EditDocumentPacketCommand EditDocumentPacketCommands = 19;
+  repeated RecipientTitleAttachment UniversalTransferDocumentBuyerTitles = 20;
+  repeated ResolutionRouteRemoval ResolutionRouteRemovals = 21;
+  repeated RecipientTitleAttachment RecipientTitles = 22;
+  repeated EditingPatch EditingPatches = 24;
+}
+
+message ReceiptAttachment {
+  required string ParentEntityId = 1;
+  required SignedContent SignedContent = 2;
+  repeated string Labels = 4;
+}
+
+message CorrectionRequestAttachment {
+  required string ParentEntityId = 1;
+  required SignedContent SignedContent = 2;
+  repeated string Labels = 4;
+}
+
+message RecipientTitleAttachment {
+  required string ParentEntityId = 1;
+  required SignedContent SignedContent = 2;
+  repeated string Labels = 4;
+  required bool NeedReceipt = 5 [default = false];
+}
+
+message RequestedSignatureRejection {
+  required string ParentEntityId = 1;
+  required SignedContent SignedContent = 2;
+  repeated string Labels = 3;
+}
+
+message RevocationRequestAttachment {
+  required string ParentEntityId = 1;
+  required SignedContent SignedContent = 2;
+  repeated string Labels = 3;
+}
+
+message XmlSignatureRejectionAttachment {
+  required string ParentEntityId = 1;
+  required SignedContent SignedContent = 2;
+  repeated string Labels = 3;
+}
+
+message ResolutionRouteAssignment {
+  required string InitialDocumentId = 1;
+  required string RouteId = 2;
+  optional string Comment = 3;
+  repeated string Labels = 4;
+}
+
+message ResolutionRouteRemoval {
+  required string ParentEntityId = 1;
+  required string RouteId = 2;
+  optional string Comment = 3;
+  repeated string Labels = 4;
+}
+
+message SignatureVerification {
+  required string InitialDocumentId = 1;
+  required bool IsValid = 2;
+  optional string ErrorMessage = 3;
+  repeated string Labels = 4;
+}
+
+message EditDocumentPacketCommand {
+  required string DocumentId = 1;
+  repeated DocumentId AddDocumentsToPacket = 2;
+  repeated DocumentId RemoveDocumentsFromPacket = 3;
+}
+
+message EditingPatch {
+  required string ParentEntityId = 1;
+  required UnsignedContent Content = 2;
+  repeated string Labels = 3;
+}
+
+message UnsignedContent {
+  optional bytes Content = 1;
+  optional string NameOnShelf = 2;
+}
+
+message DocumentSignature {
+  required string ParentEntityId = 1;
+  optional bytes Signature = 2;
+  optional bool SignWithTestSignature = 4 [default = false];
+  optional bool IsApprovementSignature = 5 [default = false];
+  optional string SignatureNameOnShelf = 6;
+  optional string PatchedContentId = 7;
+  repeated string Labels = 8;
+  optional PowerOfAttorneyToPost PowerOfAttorney = 9;
+}
+
+message ResolutionAttachment {
+  required string InitialDocumentId  = 1;
+  required ResolutionType ResolutionType = 2;
+  optional string Comment = 3;
+  repeated string Labels = 4;
+}
+
+message ResolutionRequestAttachment {
+  required string InitialDocumentId = 1;
+  required ResolutionRequestType Type = 2;
+  optional string TargetUserId = 3;
+  optional string TargetDepartmentId = 4;
+  optional string Comment = 5;
+  repeated string Labels = 6;
+}
+
+message ResolutionRequestCancellationAttachment {
+  required string InitialResolutionRequestId = 1;
+  optional string Comment = 2;
+  repeated string Labels = 3;
+}
+
+message CustomDataPatch {
+  required string ParentEntityId = 1;
+  required CustomDataPatchOperation Operation = 2;
+  required string Key = 3;
+  optional string Value = 4;
+}
+
+enum CustomDataPatchOperation {
+  SetOperation = 0;
+  RemoveOperation = 1;
+}
+
+message MessagePatch {
+  required string MessageId = 1;
+  required sfixed64 TimestampTicks = 2;
+  repeated Entity Entities = 3;
+  optional bool ForDraft = 4 [default = false];
+  optional bool DraftIsRecycled = 5 [default = false];
+  repeated string DraftIsTransformedToMessageIdList = 6;
+  optional bool DraftIsLocked = 7 [default = false];
+  optional bool MessageIsDeleted = 8 [default = false];
+  repeated EntityPatch EntityPatches = 9;
+  optional bool MessageIsRestored = 10 [default = false];
+  optional bool MessageIsDelivered = 11 [default = false];
+  optional string DeliveredPatchId = 12;
+  required string PatchId = 13;
+  optional string NotDeliveredEventId = 14;
+  required MessageType MessageType = 15;
+}
+
+message EntityPatch {
+  required string EntityId = 1;
+  optional bool DocumentIsDeleted = 2 [default = false];
+  optional string MovedToDepartment = 3;
+  optional bool DocumentIsRestored = 4 [default = false];
+  optional bool ContentIsPatched = 5 [default = false];
+  optional string ForwardedToBoxId = 6;
+}
+
+message BoxEvent {
+  required string EventId = 1;
+  optional Message Message = 2;
+  optional MessagePatch Patch = 3;
+  optional string IndexKey = 4;
+}
+
+message BoxEventList {
+  repeated BoxEvent Events = 1;
+  optional int32 TotalCount = 2;
+  required TotalCountType TotalCountType = 3;
+}
+
+message GetDocflowBatchRequest
+{
+  repeated GetDocflowRequest Requests = 1;
+}
+
+message GetDocflowRequest
+{
+  required DocumentId DocumentId = 1;
+  optional string LastEventId = 2;
+  optional bool InjectEntityContent = 3 [default = false];
+}
+
+message GetDocflowBatchResponseV3
+{
+  repeated DocumentWithDocflowV3 Documents = 1;
+}
+
+message DocumentWithDocflowV3
+{
+  required DocumentId DocumentId = 1;
+  required LastEvent LastEvent = 2;
+  required DocumentInfoV3 DocumentInfo = 3;
+  required DocflowV3 Docflow = 4;
+}
+
+message LastEvent
+{
+  required string EventId = 1;
+  required Timestamp Timestamp = 2;
+}
+
+message DocumentInfoV3
+{
+  required FullVersion FullVersion = 1;
+  required MessageType MessageType = 2;
+  required int32 WorkflowId = 3;
+  required DocumentParticipants Participants = 4;
+  required DocumentDirection DocumentDirection = 5;
+  required string DepartmentId = 6;
+  optional string CustomDocumentId = 7;
+  repeated MetadataItem Metadata = 8;
+  repeated CustomDataItem CustomData = 9;
+  required DocumentLinks DocumentLinks = 10;
+  required PacketInfo PacketInfo = 11;
+  required bool IsRead = 12;
+  required bool IsDeleted = 13;
+  required bool IsInvitation = 14;
+  optional DocumentLetterInfo LetterInfo = 15;
+  optional DocumentDraftInfo DraftInfo = 16;
+  optional DocumentTemplateInfo TemplateInfo = 17;
+  optional Origin Origin = 18;
+  optional string EditingSettingId = 19 [default = ""];
+}
+
+message PacketInfo
+{
+  required LockMode LockMode = 1;
+  optional string PacketId = 2; // актуально только для письма
+  optional Timestamp AddedAt = 3; // актуально только для письма
+}
+
+message DocumentLinks
+{
+  repeated DocumentId InitialIds = 1;
+  repeated DocumentId SubordinateIds = 2;
+}
+
+message FullVersion {
+  required string TypeNamedId = 1;
+  required string Function = 2;
+  required string Version = 3;
+}
+
+message DocumentLetterInfo
+{
+  required bool IsEncrypted = 1;
+  repeated ForwardDocumentEvent ForwardDocumentEvents = 2;
+  required bool IsTest = 3;
+}
+
+message DocumentDraftInfo
+{
+  required bool IsRecycled = 1;
+  required bool IsLocked = 2;
+  repeated string TransformedToLetterIds = 3;
+}
+
+message DocumentTemplateInfo
+{
+  required DocumentParticipants LetterParticipants = 1;
+  repeated string TransformedToLetterIds = 2;
+  repeated TemplateTransformationInfoDocflow TemplateTransformationInfos = 3;
+  optional TemplateRefusalInfoDocflow TemplateRefusalInfo = 4;
+  optional bool IsReusable = 5 [default = false];
+}
+
+message DocumentParticipants
+{
+  required DocumentParticipant Sender = 1;
+  optional DocumentParticipant Proxy = 2;
+  optional DocumentParticipant Recipient = 3;
+  required bool IsInternal = 4;
+}
+
+message DocumentParticipant
+{
+  required string BoxId = 1;
+  optional string DepartmentId = 2;
+}
+
+message TemplateTransformationInfoDocflow
+{
+  required string TransformationId = 1;
+  optional DocumentId TransformedToLetterId = 2;
+  optional string AuthorUserId = 3;
+}
+
+message TemplateRefusalInfoDocflow
+{
+  required string BoxId = 1;
+  optional string AuthorUserId = 2;
+  optional string AuthorName = 3;
+  optional string Comment = 4;
+}
+
+message DocflowV3
+{
+  required SenderTitleDocflow SenderTitle = 1;
+  optional ConfirmationDocflow Confirmation = 2;
+  optional ParticipantResponseDocflow ProxyResponse = 11;
+  optional ReceiptDocflowV3 RecipientReceipt = 4;
+  optional ParticipantResponseDocflow RecipientResponse = 5;
+  optional AmendmentRequestDocflow AmendmentRequest = 6;
+  optional RevocationDocflowV3 Revocation = 7;
+  optional ReceiptDocflowV3 SenderReceipt = 8;
+  optional ResolutionDocflowV3 Resolution = 9;
+  optional ResolutionEntitiesV3 ResolutionEntities = 10;
+  repeated OuterDocflow OuterDocflows = 12;
+  repeated OuterDocflowEntities OuterDocflowEntities = 13;
+  required DocflowStatusV3 DocflowStatus = 14;
+}
+
+message ResolutionDocflowV3
+{
+  required bool IsFinished = 1;
+  required string ParentEntityId = 2;
+  required ResolutionStatus ResolutionStatus = 3;
+  optional string ResolutionEntityId = 4;
+}
+
+message OuterDocflow
+{
+  required string DocflowNamedId = 1;
+  required string ParentEntityId = 2;
+  required string OuterDocflowEntityId = 3;
+}
+
+message RevocationDocflowV3
+{
+  required bool IsFinished = 1;
+  required RevocationRequestDocflow RevocationRequest = 2;
+  optional RevocationResponseDocflow RevocationResponse = 3;
+  required string InitiatorBoxId = 4;
+  required RevocationStatus RevocationStatus = 5;
+  optional ResolutionEntitiesV3 ResolutionEntities = 6;
+  repeated OuterDocflowEntities OuterDocflowEntities  = 7;
+}
+
+message OuterDocflowEntities
+{
+  required string DocflowNamedId = 1;
+  required string DocflowFriendlyName = 2;
+  repeated StatusEntity StatusEntities = 3;
+}
+
+message StatusEntity
+{
+  required SignedAttachmentV3 Attachment = 1;
+  required Status Status = 2;
+}
+
+message ResolutionEntitiesV3
+{
+  repeated ResolutionRequestV3 Requests = 1;
+  repeated ResolutionV3 Resolutions = 2;
+  repeated ApprovementSignatureV3 ApprovementSignatures = 3;
+  repeated SignatureDenialV3 SignatureDenials = 4;
+}
+
+message ResolutionRequestV3
+{
+  required Entity Entity = 1;
+  required ResolutionTarget Target = 2;
+  optional string AuthorUserId = 3;
+  required ResolutionRequestType RequestType = 4;
+  optional string ResolvedWith = 5;
+  repeated ResolutionAction Actions = 6;
+}
+
+message ApprovementSignatureV3
+{
+  required SignatureV3 Signature = 1;
+  optional string ResolutionRequestId = 2;
+  optional string AuthorUserId = 3;
+}
+
+message SignatureDenialV3
+{
+  required Entity Entity = 1;
+  required string ResolutionRequestId = 2;
+  optional string AuthorUserId = 3;
+}
+
+message ResolutionV3
+{
+  required Entity Entity = 1;
+  optional string ResolutionRequestId = 2;
+  optional string AuthorUserId = 3;
+  required ResolutionType ResolutionType = 4;
+}
+
+message RevocationRequestDocflow
+{
+  required SignedAttachmentV3 RevocationRequest = 1;
+  optional Timestamp SentAt = 2;
+  optional Timestamp DeliveredAt = 3;
+  optional RoamingNotification RoamingNotification = 4;
+  optional string PlainText = 5;
+}
+
+message RevocationResponseDocflow
+{
+  optional SignatureV3 RecipientSignature = 1;
+  optional SignatureRejectionDocflow SignatureRejection = 2;
+}
+
+message AmendmentRequestDocflow
+{
+  required bool IsFinished = 1;
+  optional SignedAttachmentV3 AmendmentRequest = 2;
+  optional Timestamp SentAt = 3;
+  optional Timestamp DeliveredAt = 4;
+  optional ReceiptDocflowV3 Receipt = 5;
+  required int32 AmendmentFlags = 6;
+  optional string PlainText = 7;
+  optional ConfirmationDocflow ConfirmationDocflow = 8;
+}
+
+
+
+message ParticipantResponseDocflow
+{
+  required bool IsFinished = 1;
+  optional SignatureV3 Signature = 2;
+  optional SignedAttachmentV3 Title = 3;
+  optional SignatureRejectionDocflow Rejection = 4;
+  optional Timestamp SentAt = 5;
+  optional Timestamp DeliveredAt = 6;
+  required RecipientResponseStatus ResponseStatus = 7;
+}
+
+message SignatureRejectionDocflow
+{
+  required SignedAttachmentV3 SignatureRejection = 1;
+  required bool IsFormal = 2;
+  optional Timestamp DeliveredAt = 3;
+  optional string PlainText = 4;
+}
+
+message ConfirmationDocflow
+{
+  required bool IsFinished = 1;
+  optional SignedAttachmentV3 ConfirmationAttachment = 2;
+  optional Timestamp ConfirmedAt = 3;
+  optional ReceiptDocflowV3 Receipt = 4;
+  optional OperatorConfirmationDocflow RoamingConfirmation = 5;
+}
+
+message ReceiptDocflowV3
+{
+  required bool IsFinished = 1;
+  optional SignedAttachmentV3 ReceiptAttachment = 2;
+  optional Timestamp SentAt = 3;
+  optional Timestamp DeliveredAt = 4;
+  optional ConfirmationDocflow Confirmation = 5;
+  required GeneralReceiptStatus Status = 6;
+}
+
+message OperatorConfirmationDocflow
+{
+  optional SignedAttachmentV3 ConfirmationAttachment = 1;
+  optional Timestamp ConfirmedAt = 2;
+}
+
+message SenderTitleDocflow
+{
+  required bool IsFinished = 1;
+  required SignedAttachmentV3 Attachment = 2;
+  optional Timestamp SentAt = 3;
+  optional Timestamp DeliveredAt = 4;
+  optional RoamingNotification RoamingNotification = 5;
+  required SenderSignatureStatus SenderSignatureStatus = 6;
+}
+
+message RoamingNotification
+{
+  required Entity Notification = 1;
+  required bool IsSuccess = 2;
+}
+
+message SignedAttachmentV3
+{
+  required Attachment Attachment = 1;
+  optional SignatureV3 Signature = 2;
+  optional Entity Comment = 3;
+  required string ContentTypeId = 4;
+}
+
+message Attachment
+{
+  optional Entity Entity = 1;
+  optional string AttachmentFilename = 2;
+  optional string DisplayFilename = 3;
+}
+
+message SignatureV3
+{
+  required Entity Cms = 1;
+  optional Entity CadesT = 2;
+  required string SignerBoxId = 3;
+  required string SignerDepartmentId = 4;
+  required bool IsValid = 5;
+  optional SignatureVerificationResult VerificationResult = 6;
+  optional Timestamp DeliveredAt = 7;
+  optional SignaturePowerOfAttorney PowerOfAttorney = 8;
+}
+
+message SignatureVerificationResult
+{
+  required bool IsValid = 1;
+  optional CertificateVerificationResult CertificateStatus = 2;
+  optional Timestamp SignatureTimestamp = 3;
+}
+
+message SignaturePowerOfAttorney {
+  required Entity Entity = 1;
+  required PowerOfAttorneyFullId FullId = 2;
+  optional PowerOfAttorneyValidationStatus Status = 3;
+  repeated PowerOfAttorneyStatusChange StatusChanges = 4;
+}
+
+message PowerOfAttorneyStatusChange {
+    required Entity Entity = 1;
+    required PowerOfAttorneyValidationStatus PowerOfAttorneyStatus = 2;
+}
+
+message CertificateVerificationResult
+{
+  required bool IsValid = 2;
+  repeated CertificateChainElement CertificateChain = 3;
+  required Timestamp VerificationTime = 4;
+}
+
+message CertificateChainElement
+{
+  required int32 CertificateChainStatusFlags = 1;
+  required bytes DerCertificate = 2;
+}
+
+message GetDocflowsByPacketIdRequest
+{
+  required string PacketId = 1;
+  optional int32 Count = 2 [default = 100];
+  optional bool InjectEntityContent = 3 [default = false];
+  optional bytes AfterIndexKey = 4;
+}
+
+message GetDocflowsByPacketIdResponseV3
+{
+  repeated FetchedDocumentV3 Documents = 1;
+  optional bytes NextPageIndexKey = 2;
+}
+
+message FetchedDocumentV3
+{
+  required DocumentWithDocflowV3 Document = 1;
+  required bytes IndexKey = 2;
+}
+
+message SearchDocflowsRequest
+{
+  required string QueryString = 1;
+  optional int32 Count = 2 [default = 100];
+  optional int32 FirstIndex = 3;
+  optional SearchScope Scope = 4 [default = SearchScopeAny];
+  optional bool InjectEntityContent = 5 [default = false];
+}
+
+enum SearchScope
+{
+  SearchScopeAny = 0;
+  SearchScopeIncoming = 1;
+  SearchScopeOutgoing = 2;
+  SearchScopeDeleted = 3;
+  SearchScopeInternal = 4;
+}
+
+message SearchDocflowsResponseV3
+{
+  repeated DocumentWithDocflowV3 Documents = 1;
+  optional bool HaveMoreDocuments = 2;
+}
+
+message GetDocflowEventsRequest
+{
+  required TimeBasedFilter Filter = 1;
+  optional bytes AfterIndexKey = 2;
+  optional bool PopulateDocuments = 3 [default = false];
+  optional bool InjectEntityContent = 4 [default = false];
+  optional bool PopulatePreviousDocumentStates = 5 [default = false];
+  repeated string MessageTypes = 6;
+  repeated string DocumentDirections = 7;
+  optional string DepartmentId = 8;
+  repeated string TypeNamedIds = 9;
+  optional string CounteragentBoxId = 10;
+  optional int32 Limit = 11 [default = 100];
+}
+
+message TimeBasedFilter
+{
+  optional Timestamp FromTimestamp = 1;
+  optional Timestamp ToTimestamp = 2;
+  optional SortDirection SortDirection = 3 [default = Ascending];
+}
+
+enum SortDirection
+{
+  UnknownSortDirection = 0;
+  Ascending = 1;
+  Descending = 2;
+}
+
+message GetDocflowEventsResponse
+{
+  optional int32 TotalCount = 1;
+  repeated DocflowEventV3 Events = 2;
+  required TotalCountType TotalCountType = 3;
+}
+
+message DocflowEventV3
+{
+  optional string EventId = 1;
+  optional Timestamp Timestamp = 2;
+  optional DocumentId DocumentId = 3;
+  optional bytes IndexKey = 4;
+  optional DocumentWithDocflowV3 Document = 5;
+  optional string PreviousEventId = 6;
+  optional DocumentWithDocflowV3 PreviousDocumentState = 7;
+}
+
+message CustomPrintFormDetectionRequest {
+  repeated DocumentId DocumentIds = 1;
+}
+
+message CustomPrintFormDetectionResult {
+  repeated CustomPrintFormDetectionItemResult Items = 1;
+}
+
+message CustomPrintFormDetectionItemResult {
+  required DocumentId DocumentId = 1;
+  required bool HasCustomPrintForm = 2;
+}
+
+message ForwardDocumentRequest
+{
+  required string ToBoxId = 1;
+  required DocumentId DocumentId = 2;
+}
+
+message ForwardDocumentResponse
+{
+  optional Timestamp ForwardTimestamp = 1;
+  optional ForwardedDocumentId ForwardedDocumentId = 2;
+}
+
+message ForwardedDocumentId
+{
+  optional string FromBoxId = 1;
+  optional DocumentId DocumentId = 2;
+  optional string ForwardEventId = 3;
+}
+
+message ForwardedDocument
+{
+  optional Timestamp ForwardTimestamp = 1;
+  optional ForwardedDocumentId ForwardedDocumentId = 2;
+  optional DocumentWithDocflow DocumentWithDocflow = 3;
+}
+
+message DocumentWithDocflow
+{
+  optional DocumentId DocumentId = 1;
+  optional string LastEventId = 2;
+  optional Timestamp LastEventTimestamp = 3;
+  optional DocumentInfo DocumentInfo = 4;
+  optional Docflow Docflow = 5;
+  repeated DocumentId InitialDocumentIds = 6;
+  repeated DocumentId SubordinateDocumentIds = 7;
+  repeated ForwardDocumentEvent ForwardDocumentEvents = 8;
+}
+
+message DocumentInfo
+{
+  optional DocumentType DocumentType = 1 [default = UnknownDocumentTypeDT];
+  optional DocumentDirection DocumentDirection = 2 [default = UnknownDocumentDirection];
+  optional bool IsTest = 3;
+  optional string CustomDocumentId = 4;
+  optional string FromDepartmentId = 5;
+  optional string ToDepartmentId = 6;
+  optional string CounteragentBoxId = 7;
+  optional DocumentDateAndNumber DocumentDateAndNumber = 8;
+  optional BasicDocumentInfo BasicDocumentInfo = 9;
+  optional InvoiceDocumentInfo InvoiceInfo = 10;
+  optional InvoiceCorrectionDocumentInfo InvoiceCorrectionInfo = 11;
+  optional PriceListDocumentInfo PriceListInfo = 12;
+  optional ContractDocumentInfo ContractInfo = 13;
+  optional SupplementaryAgreementDocumentInfo SupplementaryAgreementInfo = 14;
+  optional UniversalTransferDocumentInfo UniversalTransferDocumentInfo = 15;
+  optional UniversalCorrectionDocumentInfo UniversalCorrectionDocumentInfo = 16;
+  optional string AttachmentVersion = 17;
+  required string Version = 18;
+}
+
+message UniversalCorrectionDocumentInfo
+{
+  optional string TotalInc = 1;
+  optional string TotalDec = 2;
+  optional string VatInc = 3;
+  optional string VatDec = 4;
+  optional int32 CurrencyCode = 5;
+  optional string Grounds = 6;
+  required FunctionType Function = 7;
+  optional DocumentDateAndNumber OriginalDocumentDateAndNumber = 8;
+  optional DocumentDateAndNumber OriginalDocumentRevisionDateAndNumber = 9;
+  optional DocumentDateAndNumber OriginalDocumentCorrectionDateAndNumber = 10;
+}
+
+message UniversalTransferDocumentInfo
+{
+  optional string Total = 1;
+  optional string Vat = 2;
+  optional int32 CurrencyCode = 3;
+  optional string Grounds = 4;
+  required FunctionType Function = 5;
+  optional DocumentDateAndNumber OriginalDocumentDateAndNumber = 6;
+}
+
+message ContractDocumentInfo
+{
+  optional string ContractPrice = 1;
+  optional string ContractType = 2;
+}
+
+message SupplementaryAgreementDocumentInfo
+{
+  optional string ContractType = 1;
+  required DocumentDateAndNumber ContractDocumentDateAndNumber = 2;
+  required DocumentDateAndNumber DocumentDateAndNumber = 3;
+  optional string Total = 4;
+}
+
+message PriceListDocumentInfo
+{
+  optional string PriceListEffectiveDate = 1;
+  optional DocumentDateAndNumber ContractDocumentDateAndNumber = 2;
+}
+
+message InvoiceDocumentInfo
+{
+  optional string Total = 1;
+  optional string Vat = 2;
+  optional int32 CurrencyCode = 3;
+  optional DocumentDateAndNumber OriginalInvoiceDateAndNumber = 4;
+}
+
+message InvoiceCorrectionDocumentInfo
+{
+  optional string TotalInc = 1;
+  optional string TotalDec = 2;
+  optional string VatInc = 3;
+  optional string VatDec = 4;
+  optional int32 CurrencyCode = 5;
+  optional DocumentDateAndNumber OriginalInvoiceDateAndNumber = 6;
+  optional DocumentDateAndNumber OriginalInvoiceRevisionDateAndNumber = 7;
+  optional DocumentDateAndNumber OriginalInvoiceCorrectionDateAndNumber = 8;
+}
+
+message BasicDocumentInfo
+{
+  optional string Total = 1;
+  optional bool NoVat = 2;
+  optional string Vat = 3;
+  optional string Grounds = 4;
+}
+
+message Docflow
+{
+  optional bool IsFinished = 1;
+  optional SignedAttachment DocumentAttachment = 2;
+  optional string DepartmentId = 3;
+  optional bool DocumentIsDeleted = 4;
+  optional DocflowStatus DocflowStatus = 5;
+  optional Timestamp SendTimestamp = 6;
+  optional Timestamp DeliveryTimestamp = 7;
+  optional InboundInvoiceDocflow InboundInvoiceDocflow = 8;
+  optional OutboundInvoiceDocflow OutboundInvoiceDocflow = 9;
+  optional XmlBilateralDocflow XmlBilateralDocflow = 10;
+  optional BilateralDocflow BilateralDocflow = 11;
+  optional UnilateralDocflow UnilateralDocflow = 12;
+  optional RevocationDocflow RevocationDocflow = 13;
+  optional ResolutionDocflow ResolutionDocflow = 14;
+  optional bool CanDocumentBeRevokedUnilaterallyBySender = 15;
+  optional string PacketId = 16;
+  repeated CustomDataItem CustomData = 17;
+  optional InboundUniversalTransferDocumentDocflow InboundUniversalTransferDocumentDocflow = 18;
+  optional OutboundUniversalTransferDocumentDocflow OutboundUniversalTransferDocumentDocflow = 19;
+  optional RoamingNotification RoamingNotification = 20;
+}
+
+message ResolutionDocflow
+{
+}
+
+message RevocationDocflow
+{
+  optional bool IsFinished = 1;
+  optional SignedAttachment RevocationRequestAttachment = 2;
+  optional RecipientSignatureDocflow RecipientSignatureDocflow = 3;
+  optional RecipientSignatureRejectionDocflow RecipientSignatureRejectionDocflow = 4;
+  optional string InitiatorBoxId = 5;
+  optional bool IsRevocationAccepted = 6;
+  optional bool IsRevocationRejected = 7;
+}
+
+message RecipientSignatureRejectionDocflow
+{
+  optional bool IsFinished = 1;
+  optional SignedAttachment RecipientSignatureRejectionAttachment = 2;
+  optional Timestamp DeliveryTimestamp = 3;
+}
+
+message RecipientSignatureDocflow
+{
+  optional bool IsFinished = 1;
+  optional Signature RecipientSignature = 2;
+  optional Timestamp DeliveryTimestamp = 3;
+}
+
+message ReceiptDocflow
+{
+  optional bool IsFinished = 1;
+  optional SignedAttachment ReceiptAttachment = 2;
+}
+
+message UnilateralDocflow
+{
+  optional bool IsFinished = 1;
+  optional ReceiptDocflow ReceiptDocflow = 2;
+  optional bool IsReceiptRequested = 3;
+  optional bool CanDocumentBeReceipted = 4;
+  optional bool CanDocumentBeSignedBySender = 5;
+}
+
+message XmlBilateralDocflow
+{
+  optional bool IsFinished = 1;
+  optional ReceiptDocflow ReceiptDocflow = 2;
+  optional BuyerTitleDocflow BuyerTitleDocflow = 3;
+  optional RecipientSignatureRejectionDocflow RecipientSignatureRejectionDocflow = 4;
+  optional bool IsReceiptRequested = 5;
+  optional bool IsDocumentSignedByRecipient = 6;
+  optional bool IsDocumentRejectedByRecipient = 7;
+  optional bool CanDocumentBeReceipted = 8;
+  optional bool CanDocumentBeSignedBySender = 9;
+  optional bool CanDocumentBeSignedOrRejectedByRecipient = 10;
+}
+
+message BuyerTitleDocflow
+{
+  optional bool IsFinished = 1;
+  optional SignedAttachment BuyerTitleAttachment = 2;
+  optional Timestamp SendTimestamp = 3;
+  optional Timestamp DeliveryTimestamp = 4;
+}
+
+message BilateralDocflow
+{
+  optional bool IsFinished = 1;
+  optional ReceiptDocflow ReceiptDocflow = 2;
+  optional RecipientSignatureDocflow RecipientSignatureDocflow = 3;
+  optional RecipientSignatureRejectionDocflow RecipientSignatureRejectionDocflow = 4;
+  optional bool IsReceiptRequested = 5;
+  optional bool IsRecipientSignatureRequested = 6;
+  optional bool IsDocumentSignedByRecipient = 7;
+  optional bool IsDocumentRejectedByRecipient = 8;
+  optional bool CanDocumentBeReceipted = 9;
+  optional bool CanDocumentBeSignedBySender = 10;
+  optional bool CanDocumentBeSignedOrRejectedByRecipient = 11;
+}
+
+message OutboundInvoiceDocflow
+{
+  optional bool IsFinished = 1;
+  optional ReceiptDocflow ReceiptDocflow = 2;
+  optional InvoiceConfirmationDocflow ConfirmationDocflow = 3;
+  optional InvoiceCorrectionRequestDocflow CorrectionRequestDocflow = 4;
+  optional Timestamp ConfirmationTimestamp = 5;
+  optional bool IsAmendmentRequested = 6;
+  optional bool IsRevised = 7;
+  optional bool IsCorrected = 8;
+  optional bool CanDocumentBeSignedBySender = 9;
+}
+
+message InvoiceConfirmationDocflow
+{
+  optional bool IsFinished = 1;
+  optional SignedAttachment ConfirmationAttachment = 2;
+  optional ReceiptDocflow ReceiptDocflow = 3;
+}
+
+message InvoiceCorrectionRequestDocflow
+{
+  optional bool IsFinished = 1;
+  optional SignedAttachment CorrectionRequestAttachment = 2;
+  optional ReceiptDocflow ReceiptDocflow = 3;
+}
+
+message InboundInvoiceDocflow
+{
+  optional bool IsFinished = 1;
+  optional InboundInvoiceReceiptDocflow ReceiptDocflow = 2;
+  optional InvoiceConfirmationDocflow ConfirmationDocflow = 3;
+  optional InvoiceCorrectionRequestDocflow CorrectionRequestDocflow = 4;
+  optional Timestamp ConfirmationTimestamp = 5;
+  optional bool IsAmendmentRequested = 6;
+  optional bool IsRevised = 7;
+  optional bool IsCorrected = 8;
+}
+
+message InboundInvoiceReceiptDocflow
+{
+  optional bool IsFinished = 1;
+  optional SignedAttachment ReceiptAttachment = 2;
+  optional InvoiceConfirmationDocflow ConfirmationDocflow = 3;
+}
+
+message InboundUniversalTransferDocumentDocflow
+{
+  optional bool IsFinished = 1;
+  optional InboundInvoiceReceiptDocflow ReceiptDocflow = 2;
+  optional InvoiceConfirmationDocflow ConfirmationDocflow = 3;
+  optional InvoiceCorrectionRequestDocflow CorrectionRequestDocflow = 4;
+  optional Timestamp ConfirmationTimestamp = 5;
+  optional bool IsAmendmentRequested = 6;
+  optional bool IsRevised = 7;
+  optional bool IsCorrected = 8;
+  optional BuyerTitleDocflow BuyerTitleDocflow = 9;
+  optional RecipientSignatureRejectionDocflow RecipientSignatureRejectionDocflow = 10;
+  optional bool IsReceiptRequested = 11;
+  optional bool IsRecipientSignatureRequested = 12;
+  optional bool IsDocumentSignedByRecipient = 13;
+  optional bool IsDocumentRejectedByRecipient = 14;
+  optional bool CanDocumentBeReceipted = 15;
+  optional bool CanDocumentBeSignedOrRejectedByRecipient = 16;
+}
+
+message OutboundUniversalTransferDocumentDocflow
+{
+  optional bool IsFinished = 1;
+  optional ReceiptDocflow ReceiptDocflow = 2;
+  optional InvoiceConfirmationDocflow ConfirmationDocflow = 3;
+  optional InvoiceCorrectionRequestDocflow CorrectionRequestDocflow = 4;
+  optional Timestamp ConfirmationTimestamp = 5;
+  optional bool IsAmendmentRequested = 6;
+  optional bool IsRevised = 7;
+  optional bool IsCorrected = 8;
+  optional bool CanDocumentBeSignedBySender = 9;
+  optional BuyerTitleDocflow BuyerTitleDocflow = 10;
+  optional RecipientSignatureRejectionDocflow RecipientSignatureRejectionDocflow = 11;
+  optional bool IsReceiptRequested = 12;
+  optional bool IsRecipientSignatureRequested = 13;
+  optional bool IsDocumentSignedByRecipient = 14;
+  optional bool IsDocumentRejectedByRecipient = 15;
+  optional bool CanDocumentBeReceipted = 16;
+  optional bool CanDocumentBeSignedOrRejectedByRecipient = 17;
+}
+
+message DocflowStatus
+{
+  optional DocflowStatusModelOld PrimaryStatus = 1;
+  optional DocflowStatusModelOld SecondaryStatus = 2;
+}
+
+message DocflowStatusModelOld
+{
+  optional DocflowStatusSeverity Severity = 1 [default = UnknownDocflowStatusSeverityDocflowStatusSeverity];
+  optional string StatusText = 2;
+  optional string StatusHint = 3;
+}
+
+enum DocflowStatusSeverity
+{
+  UnknownDocflowStatusSeverityDocflowStatusSeverity = 0;
+  InfoDocflowStatusSeverity = 1;
+  SuccessDocflowStatusSeverity = 2;
+  WarningDocflowStatusSeverity = 3;
+  ErrorDocflowStatusSeverity = 4;
+}
+
+message SignedAttachment
+{
+  optional Attachment Attachment = 1;
+  optional Signature Signature = 2;
+  optional Entity Comment = 3;
+}
+
+message Signature
+{
+  optional Entity Entity = 1;
+  optional string SignerBoxId = 2;
+  optional string SignerDepartmentId = 3;
+  optional bool IsValid = 4;
+  optional SignatureVerificationResult VerificationResult = 5;
+}
+
+message UniversalTransferDocumentSellerTitleInfo {
+  required FunctionType Function = 1;  // Функция документа // Функция
+  optional string DocumentName = 2;    // Наименование первичного документа, определенное организацией // НаимДокОпр
+  required string DocumentDate  = 3;   // дата УПД // ДатаСчФ
+  required string DocumentNumber  = 4; // номер УПД // НомерСчФ
+  required ExtendedOrganizationInfo Seller = 5;    // продавец // СвПрод
+  required ExtendedOrganizationInfo Buyer = 6;     // покупатель //СвПокуп
+  optional Shipper Shipper = 7;                                  // грузоотправитель //ГрузОт
+  optional ExtendedOrganizationInfo Consignee = 8; // грузополучатель //ГрузПолуч
+  repeated ExtendedSigner Signers = 9;        // подписант // Подписант
+  repeated PaymentDocumentInfo PaymentDocuments = 10; // платежно-расчетные документы // СвПРД
+  optional InvoiceTable InvoiceTable = 11;            // Сведения таблицы счета-фактуры // ТаблСчФакт
+  required string Currency = 12;                      // валюта (код) // КодОКВ
+  optional string CurrencyRate = 13;                  // Курс валюты // КурсВал
+  optional string RevisionDate = 14;                  // дата ИСФ (обязательно при формировании UniversalTransferDocumentSellerTitleRevision) // ДатаИспрСчФ
+  optional string RevisionNumber = 15;                // номер ИСФ (обязательно при формировании UniversalTransferDocumentSellerTitleRevision) // НомИспрСчФ
+  optional AdditionalInfoId AdditionalInfoId = 16;    // информационное поле документа // ИнфПолФХЖ1
+  optional TransferInfo TransferInfo = 17;            // Сведения о передаче (сдаче) // СвПродПер
+  required string DocumentCreator = 18;               // Составитель файла обмена счета-фактуры (информации продавца) // НаимЭконСубСост
+  optional string DocumentCreatorBase = 19;           // Основание, по которому экономический субъект является составителем файла обмена счета-фактуры //ОснДоверОргСост
+  optional string GovernmentContractInfo = 20;         // ИдГосКон
+}
+
+message PaymentDocumentInfo {
+  required string DocumentDate = 1;
+  required string DocumentNumber = 2;
+}
+
+message ExtendedSigner {
+  optional string BoxId = 1;
+  optional bytes SignerCertificate = 2;
+  optional string SignerCertificateThumbprint = 3;
+  optional ExtendedSignerDetails SignerDetails = 4;
+  optional PowerOfAttorneyToPost PowerOfAttorney = 5;
+}
+
+message ExtendedSignerDetails {
+  required string Surname = 1;
+  required string FirstName = 2;
+  optional string Patronymic = 3;
+  optional string JobTitle = 4;
+  optional string Inn = 5;
+  optional string RegistrationCertificate = 6;
+
+  required SignerType SignerType = 7 [default = LegalEntitySignerType]; // Физическое лицо-Индивидуальный предприниматель – представитель юридического лица (ФЛ-ИП-ЮЛ)
+  optional string SignerOrganizationName = 8;                 // Наименование (НаимОрг)
+  optional string SignerInfo = 9;                             // Иные сведения, идентифицирующие физическое лицо (ИныеСвед)
+  required SignerPowers SignerPowers = 10;                    // Область полномочий (ОблПолн)
+  required SignerStatus SignerStatus = 11;                    // Статус (Статус)
+  optional string SignerPowersBase = 12;                      // Основание полномочий (доверия) (ОснПолн)
+  optional string SignerOrgPowersBase = 13;                   // Основание полномочий (доверия) организации (ОснПолнОрг)
+}
+
+message ExtendedSignerDetailsToPost {
+  optional string JobTitle = 1;
+  optional string RegistrationCertificate = 2;
+  required SignerType SignerType = 3;        // Физическое лицо-Индивидуальный предприниматель – представитель юридического лица (ФЛ-ИП-ЮЛ)
+  optional string SignerInfo = 4;            // Иные сведения, идентифицирующие лицо (Юл.ИныеСвед или СвИП.ИныеСвед  или ФЛ.ИныеСвед)
+  required SignerPowers SignerPowers = 5;    // Область полномочий (ОблПолн)
+  required SignerStatus SignerStatus = 6;    // Статус (Статус)
+  optional string SignerPowersBase = 7;      // Основание полномочий (доверия) (ОснПолн)
+  optional string SignerOrgPowersBase = 8;   // Основание полномочий (доверия) организации (ОснПолнОрг)
+}
+
+enum SignerType {
+  LegalEntitySignerType = 1;      // Представитель юридического лица
+  IndividualEntitySignerType = 2; // Индивидуальный предприниматель
+  PhysicalPersonSignerType = 3;   // Физическое лицо
+}
+
+enum SignerPowers {
+  InvoiceSigner = 0;                                  // лицо, ответственное за подписание счетов-фактур
+  PersonMadeOperation = 1;                            // лицо, совершившее сделку, операцию
+  MadeAndSignOperation = 2;                           // лицо, совершившее сделку, операцию и ответственное за её оформление;
+  PersonDocumentedOperation = 3;                      // лицо, ответственное за оформление свершившегося события;
+  MadeOperationAndSignedInvoice = 4;                  // лицо, совершившее сделку, операцию и ответственное за подписание счетов-фактур;
+  MadeAndResponsibleForOperationAndSignedInvoice = 5; // лицо, совершившее сделку, операцию и ответственное за её оформление и за подписание счетов-фактур;
+  ResponsibleForOperationAndSignerForInvoice = 6;     // лицо, ответственное за оформление свершившегося события и за подписание счетов-фактур;
+  ChairmanCommission = 7;            // председатель комиссии
+  MemberCommission = 8;              // член комиссии
+  PersonApprovedDocument = 21;       // лицо, в полномочия которого входит утверждение документа, оформляющего событие (факт хозяйственной жизни)
+  PersonConfirmedDocument = 22;      // лицо, в полномочия которого входит подтверждение оформленного события (факта хозяйственной жизни)
+  PersonAgreedOnDocument = 23;       // лицо, в полномочия которого входит согласование документа, оформляющего событие (факт хозяйственной жизни)
+  PersonOtherPower = 29;             // лицо с иными полномочиями
+}
+
+enum SignerStatus {
+  SellerEmployee = 1;                  // Работник организации продавца товаров (работ, услуг, имущественных прав);
+  InformationCreatorEmployee = 2;      // Работник организации - составителя информации продавца;
+  OtherOrganizationEmployee = 3;       // Работник иной уполномоченной организации;
+  AuthorizedPerson= 4;                 // Уполномоченное физическое лицо (в том числе индивидуальный предприниматель)
+  BuyerEmployee = 5;                   // Работник организации - покупателя (для документов в формате приказа №820);
+  InformationCreatorBuyerEmployee = 6; // Работник организации - составителя файла обмена информации покупателя, если составитель файла обмена информации покупателя не является покупателем (для документов в формате приказа №820 и №423)
+}
+
+enum FunctionType {
+  Invoice = 0;         // СЧФ
+  Basic = 1;           // ДОП
+  InvoiceAndBasic = 2; // СЧФДОП
+}
+
+message Shipper {
+  optional bool SameAsSeller = 1; // совпадает с продавцом // ОнЖе
+  optional ExtendedOrganizationInfo OrgInfo = 2; // реквизиты организации // ГрузОтпр
+}
+
+
+message InvoiceTable {
+  repeated ExtendedInvoiceItem Items = 1;   // информация о товарах // СведТов
+  optional string TotalWithVatExcluded = 2; // Сумма без учета налога // СтТовБезНДСВсего
+  required string Vat = 3;                  // Сумма налога // СумНалВсего
+  required string Total = 4;                // Сумма всего // СтТовУчНалВсего
+  optional string TotalNet = 5;             // Нетто всего // НеттоВс
+}
+
+message ExtendedInvoiceItem {
+  required string Product = 1;  // наименование товара // НаимТов
+  optional string Unit = 2;     // единицы измерения товара (код) // ОКЕИ_Тов
+  optional string UnitName = 3; // наименование единицы измерения товара. Пользователь заполняет, если ОКЕИ_Тов=’0000’// НаимЕдИзм
+  optional string Quantity = 4; // количество единиц товара // КолТов
+  optional string Price = 5;    // цена за единицу товара // ЦенаТов
+  optional string Excise = 6;   // акциз // СумАкциз
+  required TaxRate TaxRate = 7; // ставка налога // НалСт
+  optional string SubtotalWithVatExcluded = 8; // сумма без учета налога // СтТовБезНДС
+  optional string Vat = 9;       // сумма налога // СумНал
+  required string Subtotal = 10; // сумма всего // СтТовУчНал
+  repeated CustomsDeclaration CustomsDeclarations = 11; // номера таможенных деклараций // СвТД
+  optional ItemMark ItemMark = 12;             // Признак товар-работа-услуга // ПрТовРаб
+  optional string AdditionalProperty = 13;     // Дополнительная информация о признаке //ДопПризн
+  optional string ItemVendorCode = 14;         // Характеристика/код/артикул/сорт товара // КодТов
+  optional string ItemToRelease = 15;          // Количество надлежит отпустить // НадлОтп
+  optional string ItemAccountDebit = 16;       // Корреспондирующие счета: дебет // КорСчДебет
+  optional string ItemAccountCredit = 17;      // Корреспондирующие счета: кредит // КорСчКредит
+  repeated AdditionalInfo AdditionalInfo = 18; // информационное поле документа // ИнфПолФХЖ2
+}
+
+message CustomsDeclaration {
+  required string CountryCode = 1;				// код страны происхождения товара
+  required string DeclarationNumber = 2;			// номер таможенной декларации
+}
+
+enum TaxRate {
+  NoVat = 0;              //без НДС
+  Percent_0 = 1;          //ставка налога 0%
+  Percent_10 = 2;         //ставка налога 10%
+  Percent_18 = 3;         //ставка налога 18%
+  Percent_20 = 4;         //ставка налога 20%
+  Fraction_10_110 = 5;    //ставка налога 10/110 (дробь)
+  Fraction_18_118 = 6;    //ставка налога 18/118 (дробь)
+  TaxedByAgent = 7;       //ставка налога "НДС исчисляется налоговым агентом"
+  Fraction_20_120 = 8;    //ставка налога 20/120 (дробь)
+}
+
+enum ItemMark {
+  NotSpecified = 0;   // не указано
+  Property = 1;       // имущество
+  Job = 2;            // работа
+  Service = 3;        // услуга
+  PropertyRights = 4; // имущественные права
+  Other = 5;          // иное
+}
+
+message TransferInfo {
+  required string OperationInfo = 1;               // Содержание операции // СодОпер
+  optional string OperationType = 2;               // Вид операции // ВидОпер
+  optional string TransferDate = 3;                // Дата отгрузки // ДатаПер
+  repeated TransferBase TransferBase = 4;          // Основание отгрузки //ОснПер
+  optional string TransferTextInfo = 5;            // Сведения о транспортировке и грузе // СвТранГруз
+  repeated Waybill Waybill = 6;                    // Транспортная накладная //ТранНакл
+  optional ExtendedOrganizationInfo Carrier = 7; // Перевозчик // Перевозчик
+  optional EmployeeOld Employee = 8;                  // Работник организации продавца //РабОргПрод
+  optional OtherIssuer  OtherIssuer = 9;           // Иное лицо //ИнЛицо
+  optional string CreatedThingTransferDate = 10;   // Дата передачи вещи, изготовленной по договору //ДатаПерВещ
+  optional string CreatedThingInfo = 11;           // Сведения о передаче, изготовленной по договору //СвПерВещ
+  optional AdditionalInfoId AdditionalInfoId = 12; // Информационное поле документа // ИнфПолФХЖ3
+}
+
+message ExtendedOrganizationInfo {
+  optional string BoxId = 1;
+  optional string OrgName = 2;
+  optional string Inn = 3;
+  optional string Kpp = 4;
+  optional Address Address = 5;
+  optional string FnsParticipantId = 6;
+  required OrgType OrgType = 7;
+  optional string Okopf = 8;
+  optional string Okpo = 9;
+  optional string Okdp = 10;
+  optional string Phone = 11;
+  optional string Email = 12;
+  optional string CorrespondentAccount = 13;
+  optional string BankAccountNumber = 14;
+  optional string BankName = 15;
+  optional string BankId = 16;
+  optional string Department = 17;
+  optional string OrganizationAdditionalInfo = 18;
+  optional string OrganizationOrPersonInfo = 19;
+  optional string IndividualEntityRegistrationCertificate = 20;
+}
+
+enum OrgType {
+  LegalEntityOrgType = 1;      // Сведения о юридическом лице, состоящем на учете в налоговых органах
+  IndividualEntityOrgType = 2; // Сведения об индивидуальном предпринимателе//
+  ForeignEntityOrgType = 3;    // Сведения об иностранном лице, не состоящем на учете в налоговых органах //
+}
+
+message TransferBase {
+  required string BaseDocumentName = 1;   // Наименование документа-основания отгрузки //НаимОсн
+  optional string BaseDocumentNumber = 2; // Номер документа-основания отгрузки //НомОсн
+  optional string BaseDocumentDate = 3;   // Дата документа-основания отгрузки //ДатаОсн
+  optional string BaseDocumentInfo = 4;   // Дополнительные сведения документа-основания отгрузки //ДопСвОсн
+}
+
+message  Waybill {
+  required  string TransferDocumentNumber = 1; // Номер транспортной накладной // НомерТранНакл
+  required  string TransferDocumentDate = 2;   // Дата транспортной накладной // ДатаТранНакл
+}
+
+message EmployeeOld {
+  required string EmployeePosition = 1;   // Должность // Должность
+  optional string EmployeeInfo = 2;       // Иные сведения, идентифицирующие физическое лицо // ИныеСвед
+  optional string EmployeeBase = 3;       // Основание полномочий представителя // ОснПолн
+  required string TransferSurname = 4;    // Фамилия //Фамилия
+  required string TransferFirstName = 5;  // Имя //Имя
+  optional string TransferPatronymic = 6; // Отчество //Отчество
+}
+
+message OtherIssuer {
+  optional string TransferEmployeePosition = 1; // Должность представителя организации // Должность //если заполнено - формируется структура «ПредОргПер», если не заполнено – «ФЛПер»
+  optional string TransferEmployeeInfo = 2;     // Иные сведения, идентифицирующие физическое лицо // ИныеСвед
+  optional string TransferOrganizationName = 3; //Наименование организации, которой доверена передача // НаимОргПер
+  optional string TransferOrganizationBase = 4; // Основание, по которому организации доверена передача // ОснДоверОргПер
+  optional string TransferEmployeeBase = 5;     //Основание полномочий представителя // ОснПолнПредПер (ОснДоверФЛ)
+  required string TransferSurname = 6;    //Фамилия //Фамилия
+  required string TransferFirstName = 7;  //Имя //Имя
+  optional string TransferPatronymic = 8; //Отчество //Отчество
+}
+
+message AdditionalInfoId {
+  optional string InfoFileId = 1;             // Идентификатор файла информационного поля // ИдФайлИнфПол
+  repeated AdditionalInfo AdditionalInfo = 2; //Текстовая информация // ТекстИнф
+}
+
+message AdditionalInfo {
+  required string Id = 1;     // Идентификатор
+  required string Value = 2;  // Значение
+}
+
+message DocumentList {
+  required int32 TotalCount = 1;
+  repeated Document Documents = 2;
+  optional bool HasMoreResults = 3;
+}
+
+message GetForwardedDocumentEventsRequest
+{
+  required TimeBasedFilter Filter = 1;
+  optional bytes AfterIndexKey = 2;
+  optional bool PopulateForwardedDocuments = 3 [default = false];
+  optional bool InjectEntityContent = 4 [default = false];
+}
+
+message GetForwardedDocumentEventsResponse
+{
+  required int32 TotalCount = 1;
+  repeated ForwardedDocumentEvent Events = 2;
+  required TotalCountType TotalCountType = 3;
+}
+
+message ForwardedDocumentEvent
+{
+  required Timestamp Timestamp = 1;
+  required ForwardedDocumentId ForwardedDocumentId = 2;
+  required bytes IndexKey = 3;
+  optional ForwardedDocument ForwardedDocument = 4;
+}
+
+message ResolutionRouteList {
+  repeated ResolutionRoute ResolutionRoutes = 1;
+}
+
+message ResolutionRoute {
+  required string RouteId = 1;
+  required string Name = 2;
+}
+
+message GetForwardedDocumentsRequest
+{
+  repeated ForwardedDocumentId ForwardedDocumentIds = 1;
+  optional bool InjectEntityContent = 2 [default = false];
+}
+
+message GetForwardedDocumentsResponse
+{
+  repeated ForwardedDocument ForwardedDocuments = 1;
+}
+
+message DocumentsMoveOperation
+{
+  required string BoxId = 1;
+  optional string ToDepartmentId = 2;
+  repeated DocumentId DocumentIds = 3;
+}
+
+message DraftToSend {
+  required string BoxId = 1;
+  required string DraftId = 2;
+  optional string ToBoxId = 3;
+  optional string ToDepartmentId = 4;
+  repeated DocumentSenderSignature DocumentSignatures = 5;
+}
+
+message DocumentSenderSignature {
+  required string ParentEntityId = 1;
+  optional bytes Signature = 2;
+  optional bool SignWithTestSignature = 4 [default = false];
+  optional string PatchedContentId = 5;
+  optional PowerOfAttorneyToPost PowerOfAttorney = 6;
+}
+
+message Template {
+  required string MessageId = 1;
+  required sfixed64 TimestampTicks = 2;
+  required string FromBoxId = 3;
+  required string ToBoxId = 4;
+  required string MessageFromBoxId = 5;
+  required string MessageToBoxId = 6;
+  repeated Entity Entities = 7;
+  optional bool IsDeleted = 8 [default = false];
+  optional string MessageToDepartmentId = 9;
+  required LockMode LockMode = 10;
+  optional string MessageProxyBoxId = 11;
+  optional string MessageProxyDepartmentId = 12;
+  optional bool IsReusable = 13 [default = false];
+}
+
+message TemplateToPost {
+  required string FromBoxId = 1;
+  required string ToBoxId = 2;
+  required string MessageFromBoxId = 3;
+  required string MessageToBoxId = 4;
+  optional string MessageToDepartmentId = 5;
+  repeated TemplateDocumentAttachment DocumentAttachments = 6;
+  optional LockMode LockMode = 7 [default = None];
+  optional string FromDepartmentId = 8;
+  optional string ToDepartmentId = 9;
+  optional string MessageProxyBoxId = 10;
+  optional string MessageProxyDepartmentId = 11;
+  optional bool IsReusable = 12 [default = false];
+}
+
+message TemplateDocumentAttachment {
+  required UnsignedContent UnsignedContent = 1;
+  optional string Comment = 2;
+  required string TypeNamedId = 3;
+  optional string Function = 4;
+  optional string Version = 5;
+  repeated MetadataItem Metadata = 6;
+  optional int32 WorkflowId = 7;
+  optional string CustomDocumentId = 8;
+  optional string EditingSettingId = 9;
+  optional bool NeedRecipientSignature = 10 [default = false];
+  optional PredefinedRecipientTitle PredefinedRecipientTitle = 11;
+  optional bool RefusalDisabled = 12 [default = false];
+  repeated CustomDataItem CustomData = 13;
+}
+
+message PredefinedRecipientTitle {
+  required UnsignedContent UnsignedContent = 1;
+}
+
+message TemplatePatchToPost {
+  repeated TemplateRefusalAttachment Refusals = 1;
+}
+
+message TemplateRefusalAttachment {
+  required string DocumentId = 1;
+  optional string Comment = 2;
+  repeated string Labels = 3;
+}
+
+message TemplateTransformationToPost {
+  required string BoxId = 1;
+  required string TemplateId = 2;
+  repeated DocumentTransformation DocumentTransformations = 3;
+}
+
+message DocumentTransformation {
+  required string DocumentId = 1;
+  optional string CustomDocumentId = 2;
+}
