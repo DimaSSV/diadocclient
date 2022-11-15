@@ -1,9 +1,9 @@
-# diadocer
-diadocer - реализация клиента для взаимодействия с [API Диадока](http://api-docs.diadoc.ru/).
+# diadocclient
+diadocclient - реализация клиента для взаимодействия с [API Диадока](http://api-docs.diadoc.ru/).
 
 Для использования библиотеки в вашем проекте необходимо выполнить команду
 ```shell
-go get github.com/DimaSSV/diadocer
+go get github.com/DimaSSV/diadocclient
 ```
 
 Для работы клиента необходимо задать переменные окружения
