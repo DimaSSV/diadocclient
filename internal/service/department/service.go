@@ -35,19 +35,19 @@ func GetDepartmentFull(ctx context.Context, a *adapter.Adapter, boxID string, de
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} Пв указанном ящике нет подразделения с указанным идентификатором:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} при обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.DepartmentAdmin{}
@@ -75,19 +75,19 @@ func GetDepartmentsFull(ctx context.Context, a *adapter.Adapter, boxID string, p
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} В указанном ящике нет подразделения с указанным идентификатором:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} при обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.DepartmentList{}
@@ -114,19 +114,19 @@ func CreateDepartment(ctx context.Context, a *adapter.Adapter, boxID string, cre
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return fmt.Errorf("{404} В указанном ящике нет подразделения с указанным идентификатором:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	return nil
@@ -149,19 +149,19 @@ func UpdateDepartment(ctx context.Context, a *adapter.Adapter, boxID string, dep
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return fmt.Errorf("{404} В указанном ящике нет подразделения с указанным идентификатором:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	return nil
@@ -183,21 +183,21 @@ func DeleteDepartment(ctx context.Context, a *adapter.Adapter, boxID string, dep
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return fmt.Errorf("{404} В указанном ящике нет подразделения с указанным идентификатором:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 409:
+	case http.StatusConflict:
 		return fmt.Errorf("{409} Запрещено удалить подразделение в переданным departmentId:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	return nil

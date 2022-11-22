@@ -36,19 +36,19 @@ func GetEntityContent(ctx context.Context, a *adapter.Adapter, boxID string, mes
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} в указанном ящике нет сообщения с идентификатором messageId, или в указанном сообщении нет сущности с идентификатором entityId, или у указанной сущности отсутствует содержимое:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} при обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	return body, nil
@@ -79,19 +79,19 @@ func GetMessage(ctx context.Context, a *adapter.Adapter, boxID string, messageID
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} в указанном ящике нет сообщений с данным идентификатором:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} при обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.Message{}
@@ -125,19 +125,19 @@ func PostMessage(ctx context.Context, a *adapter.Adapter, operationID string, po
 		}
 		time.Sleep(time.Duration(sleepTime) * time.Second)
 		return PostMessage(ctx, a, operationID, post)
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат, или отсутствуют обязательные параметры, или превышено максимально допустимое количество документов в сообщении:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен:\n%s", string(body))
-	case 405:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 409:
+	case http.StatusConflict:
 		return nil, fmt.Errorf("{409} Осуществляется попытка отправить дубликат сообщения или запрещен приема документов от контрагентов согласно свойству Sociability из Organization:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.Message{}
@@ -171,19 +171,19 @@ func PostMessagePatch(ctx context.Context, a *adapter.Adapter, operationID strin
 		}
 		time.Sleep(time.Duration(sleepTime) * time.Second)
 		return PostMessagePatch(ctx, a, operationID, post)
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат, или отсутствуют обязательные параметры, или превышено максимально допустимое количество документов в сообщении:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 409:
+	case http.StatusConflict:
 		return nil, fmt.Errorf("{409} осуществляется попытка отправить дубликат или запрещен прием документов от контрагентов согласно свойству Sociability в структуре …/proto/Organization:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.MessagePatch{}

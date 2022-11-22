@@ -36,19 +36,19 @@ func GetTemplate(ctx context.Context, a *adapter.Adapter, boxID string, template
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором orgID закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ресурсу с предоставленным авторизационным токеном запрещен:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} Не найден ящик или шаблон с указанными идентификаторами:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.Template{}
@@ -75,7 +75,7 @@ func PostTemplate(ctx context.Context, a *adapter.Adapter, operationID string, p
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 204:
+	case http.StatusNoContent:
 		if value, ok := response.Header["Retry-After"]; ok {
 			sleepTime, err := strconv.Atoi(value[0])
 			if err != nil {
@@ -84,21 +84,21 @@ func PostTemplate(ctx context.Context, a *adapter.Adapter, operationID string, p
 			time.Sleep(time.Duration(sleepTime) * time.Second)
 		}
 		return PostTemplate(ctx, a, operationID, post)
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором orgID закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ресурсу с предоставленным авторизационным токеном запрещен:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} Не найден ящик или шаблон с указанными идентификаторами:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 409:
+	case http.StatusConflict:
 		return nil, fmt.Errorf("{409} Осуществляется попытка отправить дубликат сообщения:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.Template{}
@@ -127,7 +127,7 @@ func PostTemplatePatch(ctx context.Context, a *adapter.Adapter, boxID string, te
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 204:
+	case http.StatusNoContent:
 		if value, ok := response.Header["Retry-After"]; ok {
 			sleepTime, err := strconv.Atoi(value[0])
 			if err != nil {
@@ -136,21 +136,21 @@ func PostTemplatePatch(ctx context.Context, a *adapter.Adapter, boxID string, te
 			time.Sleep(time.Duration(sleepTime) * time.Second)
 		}
 		return PostTemplatePatch(ctx, a, boxID, templateID, operationID, post)
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором orgID закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен, или нет доступа к шаблону, или отсутствуют права на создание/редактирование документов:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} Не найден шаблон документа:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 409:
+	case http.StatusConflict:
 		return nil, fmt.Errorf("{409}  осуществляется попытка отклонить шаблон в неподходящем статусе:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.MessagePatch{}
@@ -177,7 +177,7 @@ func TransformTemplateToMessage(ctx context.Context, a *adapter.Adapter, operati
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 204:
+	case http.StatusNoContent:
 		if value, ok := response.Header["Retry-After"]; ok {
 			sleepTime, err := strconv.Atoi(value[0])
 			if err != nil {
@@ -186,21 +186,21 @@ func TransformTemplateToMessage(ctx context.Context, a *adapter.Adapter, operati
 			time.Sleep(time.Duration(sleepTime) * time.Second)
 		}
 		return TransformTemplateToMessage(ctx, a, operationID, post)
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором orgID закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} Не найден шаблон документа:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 409:
+	case http.StatusConflict:
 		return nil, fmt.Errorf("{409} Осуществляется попытка отправить дубликат сообщения:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.Message{}

@@ -43,17 +43,17 @@ func CreateEmployee(ctx context.Context, a *adapter.Adapter, boxID string, creat
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} при обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.Employee{}
@@ -80,19 +80,19 @@ func DeleteEmployee(ctx context.Context, a *adapter.Adapter, boxID string, userI
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return fmt.Errorf("{404} Не найден сотрудник с указанным идентификатором:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return fmt.Errorf("{500} при обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	return nil
@@ -114,19 +114,19 @@ func GetEmployee(ctx context.Context, a *adapter.Adapter, boxID string, userID s
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} В указанном ящике нет пользователя с указанным идентификатором:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.Employee{}
@@ -154,19 +154,19 @@ func GetEmployees(ctx context.Context, a *adapter.Adapter, boxID string, page in
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} Указанного ящика не существует:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.EmployeeList{}
@@ -192,19 +192,19 @@ func GetMyEmployee(ctx context.Context, a *adapter.Adapter, boxID string) (*mode
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} В указанном ящике нет пользователя с указанным идентификатором:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.Employee{}
@@ -228,11 +228,11 @@ func GetMyUserV2(ctx context.Context, a *adapter.Adapter) (*model.UserV2, error)
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.UserV2{}
@@ -256,11 +256,11 @@ func GetMyUser(ctx context.Context, a *adapter.Adapter) (*model.User, error) {
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.User{}
@@ -286,19 +286,19 @@ func GetOrganizationUsers(ctx context.Context, a *adapter.Adapter, orgID string)
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} Организация с указанным идентификатором не найдена в справочнике:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.OrganizationUsersList{}
@@ -325,19 +325,19 @@ func GetSubscriptions(ctx context.Context, a *adapter.Adapter, boxID string, use
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора и не от имени пользователя, подписки которого запрошены:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} В указанном ящике нет пользователя с указанным идентификатором:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.EmployeeSubscriptions{}
@@ -365,17 +365,17 @@ func UpdateEmployee(ctx context.Context, a *adapter.Adapter, boxID string, userI
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.Employee{}
@@ -400,15 +400,15 @@ func UpdateMyUser(ctx context.Context, a *adapter.Adapter, update *model.UserToU
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.UserV2{}
@@ -436,19 +436,19 @@ func UpdateSubscriptions(ctx context.Context, a *adapter.Adapter, boxID string, 
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 400:
+	case http.StatusBadRequest:
 		return nil, fmt.Errorf("{400} Данные в запросе имеют неверный формат или отсутствуют обязательные параметры:\n%s", string(body))
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 403:
+	case http.StatusForbidden:
 		return nil, fmt.Errorf("{403} Доступ к ящику с предоставленным авторизационным токеном запрещен или запрос сделан не от имени администратора и не от имени пользователя, подписки которого редактируются:\n%s", string(body))
-	case 404:
+	case http.StatusNotFound:
 		return nil, fmt.Errorf("{404} в указанном ящике нет пользователя с указанным идентификатором:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.EmployeeSubscriptions{}
@@ -474,13 +474,13 @@ func GetMyCertificates(ctx context.Context, a *adapter.Adapter, boxID string) (*
 		}
 	}(response.Body)
 	switch response.StatusCode {
-	case 401:
+	case http.StatusUnauthorized:
 		return nil, fmt.Errorf("{401} В запросе отсутствует HTTP-заголовок Authorization или в этом заголовке содержатся некорректные авторизационные данные:\n%s", string(body))
-	case 402:
+	case http.StatusPaymentRequired:
 		return nil, fmt.Errorf("{402} У организации с указанным идентификатором boxId закончилась подписка на API:\n%s", string(body))
-	case 405:
+	case http.StatusMethodNotAllowed:
 		return nil, fmt.Errorf("{405} Используется неподходящий HTTP-метод:\n%s", string(body))
-	case 500:
+	case http.StatusInternalServerError:
 		return nil, fmt.Errorf("{500} При обработке запроса возникла непредвиденная ошибка:\n%s", string(body))
 	}
 	result := model.CertificateList{}
