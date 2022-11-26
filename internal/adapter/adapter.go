@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/DimaSSV/diadocclient/internal/config"
+	"github.com/DimaSSV/diadocclient/pkg/logging"
 	"github.com/DimaSSV/diadocclient/pkg/model"
 	"google.golang.org/protobuf/proto"
 	"io"
@@ -100,7 +101,12 @@ func (a *Adapter) CallMethod(ctx context.Context, method string, resource string
 		// ??? вызвать получение токена?
 	}
 
+	logging.Trace(fmt.Sprintf("Выполняется метод %s Диадок с параметрами %d", resource, params))
+
 	response, err = a.client.Do(request)
+
+	logging.Trace(fmt.Sprintf("Получен ответ с кодом %s от Диадок", response.StatusCode))
+
 	if response.StatusCode == 401 && strings.Compare(resource, authEndpoint) != 0 {
 		err = a.getToken(ctx)
 		if err != nil {
