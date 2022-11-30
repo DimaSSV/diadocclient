@@ -3,7 +3,6 @@ package diadocсlient
 import (
 	"context"
 	"github.com/DimaSSV/diadocclient/internal/adapter"
-	"github.com/DimaSSV/diadocclient/internal/config"
 	"github.com/DimaSSV/diadocclient/internal/service/counteragent"
 	"github.com/DimaSSV/diadocclient/internal/service/department"
 	"github.com/DimaSSV/diadocclient/internal/service/docflow"
@@ -20,12 +19,16 @@ type DiadocClient struct {
 	adapter *adapter.Adapter
 }
 
-func New() DiadocClient {
-	conf := config.New()
+func New(login string, password string, clientID string, initialToken string) (DiadocClient, error) {
 	client := DiadocClient{
-		adapter: adapter.New(&conf),
+		adapter: adapter.New(login, password, clientID, initialToken),
 	}
-	return client
+	if len(initialToken) == 0 {
+		if err := client.adapter.UpdateToken(context.Background()); err != nil {
+			return client, err
+		}
+	}
+	return client, nil
 }
 
 /////////////////////////////////////////////////////////////////

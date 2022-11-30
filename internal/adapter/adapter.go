@@ -5,8 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/DimaSSV/diadocclient/internal/config"
-	"github.com/DimaSSV/diadocclient/pkg/logging"
 	"github.com/DimaSSV/diadocclient/pkg/model"
 	"google.golang.org/protobuf/proto"
 	"io"
@@ -27,18 +25,17 @@ type Adapter struct {
 	client   http.Client
 }
 
-func New(cfg *config.Config) *Adapter {
+func New(login string, password string, clientID string, initialToken string) *Adapter {
 	adapter := Adapter{
-		clientId: cfg.Diadoc.ClientID,
-		login:    cfg.Diadoc.Login,
-		password: cfg.Diadoc.Password,
-		host:     cfg.Diadoc.Host,
-		token:    cfg.Diadoc.Token,
+		clientId: clientID,
+		login:    login,
+		password: password,
+		token:    initialToken,
 	}
 	return &adapter
 }
 
-func (a *Adapter) getToken(ctx context.Context) error {
+func (a *Adapter) UpdateToken(ctx context.Context) error {
 	a.token = ""
 	params := make(map[string]string)
 	params["type"] = "password"
@@ -72,13 +69,13 @@ func (a *Adapter) CallMethod(ctx context.Context, method string, resource string
 	)
 
 	if len(a.token) == 0 && strings.Compare(resource, authEndpoint) != 0 {
-		err = a.getToken(ctx)
+		err = a.UpdateToken(ctx)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	request, err = http.NewRequestWithContext(ctx, method, "https://"+a.host, bytes.NewBuffer(data))
+	request, err = http.NewRequestWithContext(ctx, method, "https://diadoc-api.kontur.ru", bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
@@ -101,14 +98,10 @@ func (a *Adapter) CallMethod(ctx context.Context, method string, resource string
 		// ??? вызвать получение токена?
 	}
 
-	logging.Trace(fmt.Sprintf("Выполняется метод %s Диадок с параметрами %d", resource, params))
-
 	response, err = a.client.Do(request)
 
-	logging.Trace(fmt.Sprintf("Получен ответ с кодом %s от Диадок", response.StatusCode))
-
 	if response.StatusCode == 401 && strings.Compare(resource, authEndpoint) != 0 {
-		err = a.getToken(ctx)
+		err = a.UpdateToken(ctx)
 		if err != nil {
 			return nil, err
 		}

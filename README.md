@@ -6,11 +6,6 @@ diadocclient - реализация клиента для взаимодейст
 go get github.com/DimaSSV/diadocclient
 ```
 
-Для работы клиента необходимо задать переменные окружения
-- DIADOC_LOGIN
-- DIADOC_PASSWORD
-- DIADOC_CLIENT_ID - указать ключ разработчика, полученный по запросу у компании Диадок
-
 Все реализованные функции доступны через экземпляр структуры "DiadocClient"
 
 Пример получения информации по текущему пользователю
@@ -24,7 +19,10 @@ import (
 )
 
 func main() {
-	client := diadocclient.New()
+	client, err := diadocclient.New("user", "password", "clientid", "")
+	if err != nil {
+		panic(err)
+	}
 	u, _ := client.GetMyUserV2(context.Background())
 	println(u.String())
 }
